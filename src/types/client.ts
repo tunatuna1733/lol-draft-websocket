@@ -9,7 +9,9 @@ type Commands =
 	| 'PickChamp'
 	| 'PickLane'
 	| 'RemovePlayer'
-	| 'Toggle';
+	| 'Toggle'
+	| 'AddNPC'
+	| 'SwapPlayers';
 
 export interface CreateRoomMessage {
 	roomName: string;
@@ -26,6 +28,7 @@ export interface JoinMessage extends BaseMessage {
 	command: 'Join';
 	name: string;
 	team: Team;
+	isSpec?: boolean;
 	beginner?: boolean;
 }
 
@@ -79,4 +82,17 @@ export interface RemovePlayerMessage extends BaseMessage {
 export interface ToggleMessage extends BaseMessage {
 	command: 'Toggle';
 	isPause: boolean;
+}
+
+export interface AddNPCMessage extends BaseMessage {
+	command: 'AddNPC';
+	name: string;
+	team: Team;
+}
+
+export interface SwapPlayersMessage extends BaseMessage {
+	command: 'SwapPlayers';
+	team: Team;
+	index1: number;
+	index2: number;
 }

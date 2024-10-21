@@ -12,6 +12,7 @@ export const createRoom = (data: CreateRoomMessage) => {
 			team: 'Blue',
 			order: 1,
 			eta: 0,
+			paused: false,
 		},
 		selectedChamp: '',
 		teams: {
@@ -28,9 +29,10 @@ export const createRoom = (data: CreateRoomMessage) => {
 				isReady: false,
 			},
 		},
-		paused: false,
 		starting: false,
 		started: false,
+		ended: false,
+		expire: Date.now() + 20 * 60 * 1000,
 	};
 	rooms.push(roomData);
 	console.log(`Created room of id: ${id}`);

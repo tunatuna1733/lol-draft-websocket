@@ -14,7 +14,8 @@ type Commands =
 	| 'PickBanChamp'
 	| 'SelectChamp'
 	| 'PickChamp'
-	| 'PickLane';
+	| 'PickLane'
+	| 'MakeSpec';
 
 export interface BaseMessage {
 	command: Commands;
@@ -27,6 +28,10 @@ export interface StartPhase extends PhaseData {
 
 export interface CurrentPhase extends PhaseData {
 	command: 'CurrentPhase';
+}
+
+export interface MakeSpec extends BaseMessage {
+	command: 'MakeSpec';
 }
 
 export interface PlayerJoin {

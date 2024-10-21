@@ -43,7 +43,7 @@ export const ready = (ws: ServerWebSocket<unknown>, data: ReadyMessage) => {
 			roomData.starting = true;
 			setTimeout(() => {
 				roomData.started = true;
-				const timer = new DraftTimer(ws, roomData.id);
+				const timer = new DraftTimer(ws, roomData);
 				timer.start();
 				timers[roomData.id] = timer;
 			}, 5 * 1000);

@@ -35,4 +35,6 @@ export interface RoomData {
 	};
 	starting: boolean;
 	started: boolean;
+	ended: boolean;
+	expire: number;
 }

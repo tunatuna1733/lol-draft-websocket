@@ -1,3 +1,4 @@
+import { addNPC } from './commands/client/addNPC';
 import { createRoom } from './commands/client/createRoom';
 import { join } from './commands/client/join';
 import { pickBanChamp } from './commands/client/pickBanChamp';
@@ -7,7 +8,10 @@ import { ready } from './commands/client/ready';
 import { removePlayer } from './commands/client/removePlayer';
 import { selectBanChamp } from './commands/client/selectBanChamp';
 import { selectChamp } from './commands/client/selectChamp';
+import { swapPlayers } from './commands/client/swapPlayer';
+import { togglePause } from './commands/client/toggle';
 import type {
+	AddNPCMessage,
 	BaseMessage,
 	JoinMessage,
 	PickBanChampMessage,
@@ -17,6 +21,8 @@ import type {
 	RemovePlayerMessage,
 	SelectBanChampMessage,
 	SelectChampMessage,
+	SwapPlayersMessage,
+	ToggleMessage,
 } from './types/client';
 import { parseCookie } from './util';
 
@@ -55,30 +61,42 @@ const server = Bun.serve<{ roomID?: string }>({
 			if (typeof message !== 'string') return;
 			console.log(message);
 			const parsedMessage: BaseMessage = JSON.parse(message);
-			if (parsedMessage.command === 'Join') {
-				const data = parsedMessage as JoinMessage;
-				join(ws, data);
-			} else if (parsedMessage.command === 'Ready') {
-				const data = parsedMessage as ReadyMessage;
-				ready(ws, data);
-			} else if (parsedMessage.command === 'SelectBanChamp') {
-				const data = parsedMessage as SelectBanChampMessage;
-				selectBanChamp(ws, data);
-			} else if (parsedMessage.command === 'PickBanChamp') {
-				const data = parsedMessage as PickBanChampMessage;
-				pickBanChamp(ws, data);
-			} else if (parsedMessage.command === 'SelectChamp') {
-				const data = parsedMessage as SelectChampMessage;
-				selectChamp(ws, data);
-			} else if (parsedMessage.command === 'PickChamp') {
-				const data = parsedMessage as PickChampMessage;
-				pickChamp(ws, data);
-			} else if (parsedMessage.command === 'PickLane') {
-				const data = parsedMessage as PickLaneMessage;
-				pickLane(ws, data);
-			} else if (parsedMessage.command === 'RemovePlayer') {
-				const data = parsedMessage as RemovePlayerMessage;
-				removePlayer(ws, data);
+			switch (parsedMessage.command) {
+				case 'Join':
+					join(ws, parsedMessage as JoinMessage);
+					break;
+				case 'Ready':
+					ready(ws, parsedMessage as ReadyMessage);
+					break;
+				case 'SelectBanChamp':
+					selectBanChamp(ws, parsedMessage as SelectBanChampMessage);
+					break;
+				case 'PickBanChamp':
+					pickBanChamp(ws, parsedMessage as PickBanChampMessage);
+					break;
+				case 'SelectChamp':
+					selectChamp(ws, parsedMessage as SelectChampMessage);
+					break;
+				case 'PickChamp':
+					pickChamp(ws, parsedMessage as PickChampMessage);
+					break;
+				case 'PickLane':
+					pickLane(ws, parsedMessage as PickLaneMessage);
+					break;
+				case 'RemovePlayer':
+					removePlayer(ws, parsedMessage as RemovePlayerMessage);
+					break;
+				case 'Toggle':
+					togglePause(ws, parsedMessage as ToggleMessage);
+					break;
+				case 'AddNPC':
+					addNPC(ws, parsedMessage as AddNPCMessage);
+					break;
+				case 'SwapPlayers':
+					swapPlayers(ws, parsedMessage as SwapPlayersMessage);
+					break;
+				default:
+					console.warn('Unknown command:', parsedMessage.command);
 			}
 		},
 		close(ws) {

@@ -1,7 +1,6 @@
 import type { ServerWebSocket } from 'bun';
 import type { CurrentPhase, StartPhase } from './types/server';
-import type { PhaseData } from './types/room';
-import { rooms } from './data';
+import type { PhaseData, RoomData } from './types/room';
 
 export class DraftTimer {
 	steps = [
@@ -30,14 +29,14 @@ export class DraftTimer {
 	stepStartTime = 0;
 	paused = false;
 	remainingTime = 0;
-	eta = 0;
-	ended = false;
 	ws: ServerWebSocket<unknown>;
+	roomData: RoomData;
 	id: string;
 	timerId?: Timer;
-	constructor(ws: ServerWebSocket<unknown>, id: string) {
+	constructor(ws: ServerWebSocket<unknown>, roomData: RoomData) {
 		this.ws = ws;
-		this.id = id;
+		this.roomData = roomData;
+		this.id = roomData.id;
 	}
 
 	start = () => {
@@ -45,35 +44,31 @@ export class DraftTimer {
 	};
 
 	startPhase = () => {
+		if (this.currentStep === this.steps.length) {
+			this.roomData.ended = true;
+			this.broadcast(JSON.stringify(this.roomData));
+			return;
+		}
 		const step = this.steps[this.currentStep];
 		console.log(`Draft phase started: ${step.kind}-${step.team}-${step.order}`);
 		this.stepStartTime = Date.now();
-		this.eta = this.stepStartTime + 30 * 1000;
+		const eta = this.stepStartTime + 30 * 1000;
 		this.currentStep++;
 		const data: PhaseData = {
 			kind: step.kind,
 			team: step.team,
 			order: step.order,
-			eta: this.eta,
+			eta,
 			paused: false,
 		};
-		const roomData = rooms.find((r) => r.id === this.id);
-		if (roomData) {
-			roomData.currentPhase = data;
-			roomData.selectedChamp = '';
-		}
+		this.roomData.currentPhase = data;
+		this.roomData.selectedChamp = '';
 		const payload: StartPhase = {
 			command: 'StartPhase',
 			...data,
 		};
-		this.ws.publish(this.id, JSON.stringify(payload));
-		this.ws.send(JSON.stringify(payload));
-		this.ws.publish(this.id, JSON.stringify(roomData));
-		this.ws.send(JSON.stringify(roomData));
-		if (this.currentStep === this.steps.length) {
-			this.ended = true;
-			return;
-		}
+		this.broadcast(JSON.stringify(payload));
+		this.broadcast(JSON.stringify(this.roomData));
 		this.timerId = setTimeout(() => {
 			this.pickSelectedChamp();
 			this.startPhase();
@@ -91,11 +86,10 @@ export class DraftTimer {
 			kind: step.kind,
 			team: step.team,
 			order: step.order,
-			eta: this.eta,
+			eta: -1,
 			paused: true,
 		};
-		this.ws.publish(this.id, JSON.stringify(payload));
-		this.ws.send(JSON.stringify(payload));
+		this.broadcast(JSON.stringify(payload));
 	};
 
 	resume = () => {
@@ -107,36 +101,36 @@ export class DraftTimer {
 				this.startPhase();
 			}, this.remainingTime);
 			this.paused = false;
-			this.eta = Date.now() + this.remainingTime;
+			const eta = Date.now() + this.remainingTime;
 			this.remainingTime = 0;
 			const payload: CurrentPhase = {
 				command: 'CurrentPhase',
 				kind: step.kind,
 				team: step.team,
 				order: step.order,
-				eta: this.eta,
+				eta,
 				paused: false,
 			};
-			this.ws.publish(this.id, JSON.stringify(payload));
-			this.ws.send(JSON.stringify(payload));
+			this.broadcast(JSON.stringify(payload));
 		}
 	};
 
 	forceNext = () => {
 		clearTimeout(this.timerId);
-		if (this.currentStep === this.steps.length) return;
 		this.startPhase();
 	};
 
 	pickSelectedChamp = () => {
 		const step = this.steps[this.currentStep - 1];
-		const roomData = rooms.find((r) => r.id === this.id);
-		if (roomData) {
-			if (step.kind === 'Ban') {
-				roomData.teams[step.team].bans[step.order - 1] = roomData.selectedChamp;
-			} else {
-				roomData.teams[step.team].players[step.order - 1].champ = roomData.selectedChamp;
-			}
+		if (step.kind === 'Ban') {
+			this.roomData.teams[step.team].bans[step.order - 1] = this.roomData.selectedChamp;
+		} else {
+			this.roomData.teams[step.team].players[step.order - 1].champ = this.roomData.selectedChamp;
 		}
+	};
+
+	private broadcast = (payload: string) => {
+		this.ws.send(payload);
+		this.ws.publish(this.roomData.id, payload);
 	};
 }
