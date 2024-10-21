@@ -31,23 +31,25 @@ export const join = (ws: ServerWebSocket<unknown>, data: JoinMessage) => {
 		champ: '',
 		isNPC: false,
 	};
-	if (roomData.teams[data.team].players.length > 5) {
-		// search for npc
-		const npcIndex = roomData.teams[data.team].players.findIndex((p) => p.isNPC);
-		if (npcIndex === -1) {
-			// the team is full
-			const payload: MakeSpec = {
-				command: 'MakeSpec',
-				roomID: roomData.id,
-			};
-			ws.send(JSON.stringify(payload));
-			ws.send(JSON.stringify(roomData));
-			ws.subscribe(roomData.id);
-			return;
-		}
-		// replace npc
-		roomData.teams[data.team].players[npcIndex] = player;
-	} else roomData.teams[data.team].players.push(player);
+	if (!roomData.teams[data.team].players.find((p) => p.name === data.name)) {
+		if (roomData.teams[data.team].players.length >= 5) {
+			// search for npc
+			const npcIndex = roomData.teams[data.team].players.findIndex((p) => p.isNPC);
+			if (npcIndex === -1) {
+				// the team is full
+				const payload: MakeSpec = {
+					command: 'MakeSpec',
+					roomID: roomData.id,
+				};
+				ws.send(JSON.stringify(payload));
+				ws.send(JSON.stringify(roomData));
+				ws.subscribe(roomData.id);
+				return;
+			}
+			// replace npc
+			roomData.teams[data.team].players[npcIndex] = player;
+		} else roomData.teams[data.team].players.push(player);
+	}
 	/*
   const pubMsg: PlayerJoin = {
 		command: 'PlayerJoin',

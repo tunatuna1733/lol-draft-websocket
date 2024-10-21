@@ -86,7 +86,7 @@ export class DraftTimer {
 			kind: step.kind,
 			team: step.team,
 			order: step.order,
-			eta: -1,
+			eta: 0,
 			paused: true,
 		};
 		this.broadcast(JSON.stringify(payload));
