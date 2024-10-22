@@ -36,11 +36,11 @@ export const ready = (ws: ServerWebSocket<unknown>, data: ReadyMessage) => {
 				isNPC: true,
 			});
 		}
-		ws.publish(roomData.id, JSON.stringify(roomData));
-		ws.send(JSON.stringify(roomData));
 		// start draft
 		if (roomData.starting === false) {
 			roomData.starting = true;
+			ws.publish(roomData.id, JSON.stringify(roomData));
+			ws.send(JSON.stringify(roomData));
 			setTimeout(() => {
 				roomData.started = true;
 				const timer = new DraftTimer(ws, roomData);
