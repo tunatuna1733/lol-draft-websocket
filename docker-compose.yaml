@@ -1,0 +1,9 @@
+version: '3'
+services:
+  lol-back:
+    container_name: 'lol-draft-backend'
+    build: .
+    ports:
+      - 443:443
+    volumes:
+      - ./:/app
