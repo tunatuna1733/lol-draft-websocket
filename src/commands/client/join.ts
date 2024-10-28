@@ -60,5 +60,4 @@ export const join = (ws: ServerWebSocket<unknown>, data: JoinMessage) => {
 	ws.send(JSON.stringify(roomData));
 	ws.subscribe(roomData.id);
 	ws.publish(roomData.id, JSON.stringify(roomData));
-	console.log(`Publised player join: ${roomData.id}`);
 };

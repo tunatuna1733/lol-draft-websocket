@@ -50,9 +50,9 @@ export class DraftTimer {
 			return;
 		}
 		const step = this.steps[this.currentStep];
-		console.log(`Draft phase started: ${step.kind}-${step.team}-${step.order}`);
 		this.stepStartTime = Date.now();
-		const eta = this.stepStartTime + 30 * 1000;
+		this.remainingTime = 30 * 1000;
+		const eta = this.stepStartTime + this.remainingTime;
 		this.currentStep++;
 		const data: PhaseData = {
 			kind: step.kind,
@@ -77,9 +77,8 @@ export class DraftTimer {
 
 	pause = () => {
 		const step = this.steps[this.currentStep - 1];
-		console.log(`Draft phase paused: ${step.kind}-${step.team}-${step.order}`);
 		clearTimeout(this.timerId);
-		this.remainingTime = 30 * 1000 - (Date.now() - this.stepStartTime);
+		this.remainingTime = this.remainingTime - (Date.now() - this.stepStartTime);
 		this.paused = true;
 		const payload: CurrentPhase = {
 			command: 'CurrentPhase',
@@ -95,14 +94,13 @@ export class DraftTimer {
 	resume = () => {
 		if (this.paused) {
 			const step = this.steps[this.currentStep - 1];
-			console.log(`Draft phase resumed: ${step.kind}-${step.team}-${step.order}`);
 			this.timerId = setTimeout(() => {
 				this.pickSelectedChamp();
 				this.startPhase();
 			}, this.remainingTime);
 			this.paused = false;
 			const eta = Date.now() + this.remainingTime;
-			this.remainingTime = 0;
+			this.stepStartTime = Date.now();
 			const payload: CurrentPhase = {
 				command: 'CurrentPhase',
 				kind: step.kind,

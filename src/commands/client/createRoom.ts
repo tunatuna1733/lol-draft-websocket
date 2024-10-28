@@ -35,6 +35,5 @@ export const createRoom = (data: CreateRoomMessage) => {
 		expire: Date.now() + 20 * 60 * 1000,
 	};
 	rooms.push(roomData);
-	console.log(`Created room of id: ${id}`);
 	return id;
 };

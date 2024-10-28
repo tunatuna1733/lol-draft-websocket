@@ -27,6 +27,7 @@ import type {
 import { parseCookie } from './util';
 
 const server = Bun.serve<{ roomID?: string }>({
+	port: 443,
 	fetch(req, server) {
 		const url = new URL(req.url);
 		if (url.pathname === '/createRoom') {
@@ -59,7 +60,6 @@ const server = Bun.serve<{ roomID?: string }>({
 		},
 		message(ws, message) {
 			if (typeof message !== 'string') return;
-			console.log(message);
 			const parsedMessage: BaseMessage = JSON.parse(message);
 			switch (parsedMessage.command) {
 				case 'Join':

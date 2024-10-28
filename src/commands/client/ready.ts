@@ -17,7 +17,6 @@ export const ready = (ws: ServerWebSocket<unknown>, data: ReadyMessage) => {
 	}
 	roomData.teams[data.team].isReady = data.isReady;
 	if (roomData.teams.Blue.isReady && roomData.teams.Red.isReady) {
-		console.log(`Both team ready: ${roomData.id} Starting in 5 seconds...`);
 		while (roomData.teams.Blue.players.length < 5) {
 			roomData.teams.Blue.players.push({
 				name: `RandomPlayer-${generateRandomString(4)}`,
