@@ -59,6 +59,7 @@ export class DraftTimer {
 			team: step.team,
 			order: step.order,
 			eta,
+			remainingTime: this.remainingTime,
 			paused: false,
 		};
 		this.roomData.currentPhase = data;
@@ -86,6 +87,7 @@ export class DraftTimer {
 			team: step.team,
 			order: step.order,
 			eta: 0,
+			remainingTime: this.remainingTime,
 			paused: true,
 		};
 		this.broadcast(JSON.stringify(payload));
@@ -107,6 +109,7 @@ export class DraftTimer {
 				team: step.team,
 				order: step.order,
 				eta,
+				remainingTime: this.remainingTime,
 				paused: false,
 			};
 			this.broadcast(JSON.stringify(payload));
