@@ -63,7 +63,7 @@ const server = Bun.serve<{ roomID?: string }>({
 			const parsedMessage: BaseMessage = JSON.parse(message);
 			switch (parsedMessage.command) {
 				case 'Join':
-					join(ws, parsedMessage as JoinMessage);
+					join(ws, parsedMessage as JoinMessage, server);
 					break;
 				case 'Ready':
 					ready(ws, parsedMessage as ReadyMessage);

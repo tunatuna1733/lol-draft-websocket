@@ -1,10 +1,10 @@
-import type { ServerWebSocket } from 'bun';
+import type { Server, ServerWebSocket } from 'bun';
 import type { JoinMessage } from '../../types/client';
 import { rooms } from '../../data';
 import type { PlayerData } from '../../types/room';
 import type { MakeSpec, ResultMessage } from '../../types/server';
 
-export const join = (ws: ServerWebSocket<unknown>, data: JoinMessage) => {
+export const join = (ws: ServerWebSocket<unknown>, data: JoinMessage, server: Server) => {
 	const roomData = rooms.find((r) => r.id === data.roomID);
 	if (!roomData) {
 		const error: ResultMessage = {
@@ -57,7 +57,7 @@ export const join = (ws: ServerWebSocket<unknown>, data: JoinMessage) => {
 		team: data.team,
 	};
   */
-	ws.send(JSON.stringify(roomData));
 	ws.subscribe(roomData.id);
-	ws.publish(roomData.id, JSON.stringify(roomData));
+	server.publish(roomData.id, JSON.stringify(roomData));
+	ws.send(JSON.stringify(roomData));
 };
