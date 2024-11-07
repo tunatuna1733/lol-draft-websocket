@@ -12,6 +12,7 @@ export const createRoom = (data: CreateRoomMessage) => {
 			team: 'Blue',
 			order: 1,
 			eta: 0,
+			remainingTime: 0,
 			paused: false,
 		},
 		selectedChamp: '',

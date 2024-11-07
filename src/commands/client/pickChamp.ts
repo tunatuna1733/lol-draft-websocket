@@ -22,6 +22,7 @@ export const pickChamp = (ws: ServerWebSocket<unknown>, data: PickChampMessage) 
 		order: data.order,
 	};
   */
+	if (Date.now() - timers[roomData.id].stepStartTime < 2 * 1000) return;
 	timers[roomData.id].pickSelectedChamp();
 	roomData.selectedChamp = '';
 	ws.publish(roomData.id, JSON.stringify(roomData));

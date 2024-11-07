@@ -30,6 +30,7 @@ export const join = (ws: ServerWebSocket<unknown>, data: JoinMessage, server: Se
 		lane: '',
 		champ: '',
 		isNPC: false,
+		isBeginner: data.beginner || false,
 	};
 	if (!roomData.teams[data.team].players.find((p) => p.name === data.name)) {
 		if (roomData.teams[data.team].players.length >= 5) {

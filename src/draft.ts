@@ -28,6 +28,7 @@ export class DraftTimer {
 	currentStep = 0;
 	stepStartTime = 0;
 	paused = false;
+	lastToggle = 0;
 	remainingTime = 0;
 	ws: ServerWebSocket<unknown>;
 	roomData: RoomData;
@@ -77,24 +78,27 @@ export class DraftTimer {
 	};
 
 	pause = () => {
-		const step = this.steps[this.currentStep - 1];
-		clearTimeout(this.timerId);
-		this.remainingTime = this.remainingTime - (Date.now() - this.stepStartTime);
-		this.paused = true;
-		const payload: CurrentPhase = {
-			command: 'CurrentPhase',
-			kind: step.kind,
-			team: step.team,
-			order: step.order,
-			eta: 0,
-			remainingTime: this.remainingTime,
-			paused: true,
-		};
-		this.broadcast(JSON.stringify(payload));
+		if (Date.now() - this.lastToggle > 2 * 1000) {
+			const step = this.steps[this.currentStep - 1];
+			clearTimeout(this.timerId);
+			this.remainingTime = this.remainingTime - (Date.now() - this.stepStartTime);
+			this.paused = true;
+			const payload: CurrentPhase = {
+				command: 'CurrentPhase',
+				kind: step.kind,
+				team: step.team,
+				order: step.order,
+				eta: 0,
+				remainingTime: this.remainingTime,
+				paused: true,
+			};
+			this.broadcast(JSON.stringify(payload));
+			this.lastToggle = Date.now();
+		}
 	};
 
 	resume = () => {
-		if (this.paused) {
+		if (this.paused && Date.now() - this.lastToggle > 2 * 1000) {
 			const step = this.steps[this.currentStep - 1];
 			this.timerId = setTimeout(() => {
 				this.pickSelectedChamp();
@@ -113,6 +117,7 @@ export class DraftTimer {
 				paused: false,
 			};
 			this.broadcast(JSON.stringify(payload));
+			this.lastToggle = Date.now();
 		}
 	};
 

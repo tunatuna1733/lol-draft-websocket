@@ -20,6 +20,7 @@ export const addNPC = (ws: ServerWebSocket<unknown>, data: AddNPCMessage) => {
 		lane: '',
 		champ: '',
 		isNPC: true,
+		isBeginner: false,
 	};
 	if (roomData.teams[data.team].players.length < 5) {
 		roomData.teams[data.team].players.push(player);

@@ -21,6 +21,7 @@ export const pickBanChamp = (ws: ServerWebSocket<unknown>, data: PickBanChampMes
 		order: data.order,
 	};
   */
+	if (Date.now() - timers[roomData.id].stepStartTime < 2 * 1000) return;
 	roomData.teams[data.team].bans[data.order - 1] = data.champ;
 	roomData.selectedChamp = '';
 	ws.publish(roomData.id, JSON.stringify(roomData));
