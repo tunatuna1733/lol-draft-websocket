@@ -6,10 +6,9 @@ import { publishTeamInfo } from '../../util';
 export const teamTransferPlayer = (server: Server, data: TeamTransferPlayerMessage) => {
 	const team = teams.find((t) => t.id === data.id);
 	if (!team) {
-		console.error(`Team not found. ID: ${data.id}`);
+		console.error(`[TransferPlayer]Team not found. ID: ${data.id}`);
 		return;
 	}
-	const id = `team-${team.id}`;
 	let player: PlayerData | null = null;
 	if (data.team !== 'Blue') {
 		const bp = team.Blue.find((p) => p.name === data.name);
@@ -33,7 +32,7 @@ export const teamTransferPlayer = (server: Server, data: TeamTransferPlayerMessa
 		}
 	}
 	if (!player) {
-		console.error(`Player not found. name: ${data.name}`);
+		console.error(`[TransferPlayer]Player not found. name: ${data.name}`);
 		return;
 	}
 	team[data.team].push(player);

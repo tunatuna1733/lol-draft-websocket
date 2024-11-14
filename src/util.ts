@@ -1,5 +1,7 @@
 import type { Server } from 'bun';
 import type { TeamCreationData } from './types/team';
+import type { Lane } from './types/lol';
+import type { Blankable } from './types/util';
 
 export const parseCookie = (str: string) =>
 	str
@@ -18,9 +20,31 @@ export const generateRandomString = (charCount = 6): string => {
 	return str.length < charCount ? str + 'a'.repeat(charCount - str.length) : str;
 };
 
+const Lanes = ['Top', 'Jungle', 'Mid', 'Bot', 'Support', ''] as const;
+const compareLane = (lane1: Blankable<Lane>, lane2: Blankable<Lane>) => {
+	if (Lanes.indexOf(lane1) < Lanes.indexOf(lane2)) return -1;
+	if (Lanes.indexOf(lane1) > Lanes.indexOf(lane2)) return 1;
+	return 0;
+};
+
 export const publishTeamInfo = (server: Server, teamData: TeamCreationData) => {
-	// TODO: sort, priority: lane, name
-	const team = teamData;
+	teamData.Blue.sort((a, b) => {
+		const laneCompResult = compareLane(a.lane, b.lane);
+		if (laneCompResult === 0) {
+			return a.name.localeCompare(b.name);
+		}
+		return laneCompResult;
+	});
+	teamData.Red.sort((a, b) => {
+		const laneCompResult = compareLane(a.lane, b.lane);
+		if (laneCompResult === 0) {
+			return a.name.localeCompare(b.name);
+		}
+		return laneCompResult;
+	});
+	teamData.Unassigned.sort((a, b) => {
+		return a.name.localeCompare(b.name);
+	});
 	const id = `team-${teamData.id}`;
-	server.publish(id, JSON.stringify(team));
+	server.publish(id, JSON.stringify(teamData));
 };
