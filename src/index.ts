@@ -14,6 +14,7 @@ import { teamAddPlayer } from './commands/team/addPlayer';
 import { createTeam } from './commands/team/createTeam';
 import { teamPickLane } from './commands/team/pickLane';
 import { teamTransferPlayer } from './commands/team/transferPlayer';
+import { teams } from './data';
 import type {
 	AddNPCMessage,
 	BaseMessage,
@@ -77,6 +78,8 @@ const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 		open(ws) {
 			if (ws.data.teamID) {
 				ws.subscribe(`team-${ws.data.teamID}`);
+				const team = teams.find((t) => t.id === ws.data.teamID);
+				if (team) ws.send(JSON.stringify(team));
 			}
 		},
 		message(ws, message) {
