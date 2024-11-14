@@ -11,6 +11,7 @@ import { selectChamp } from './commands/draft/selectChamp';
 import { swapPlayers } from './commands/draft/swapPlayer';
 import { togglePause } from './commands/draft/toggle';
 import { teamAddPlayer } from './commands/team/addPlayer';
+import { autoAssignPlayer } from './commands/team/autoAssignPlayer';
 import { createTeam } from './commands/team/createTeam';
 import { teamPickLane } from './commands/team/pickLane';
 import { teamTransferPlayer } from './commands/team/transferPlayer';
@@ -96,6 +97,9 @@ const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 						break;
 					case 'TransferPlayer':
 						teamTransferPlayer(server, parsedMessage);
+						break;
+					case 'AutoAssignPlayer':
+						autoAssignPlayer(parsedMessage, server);
 						break;
 					default:
 						console.warn('Unknown command');

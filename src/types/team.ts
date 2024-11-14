@@ -11,7 +11,11 @@ export interface CreateTeamPayload {
 	players: CreateTeamPlayer[];
 }
 
-export type TeamMessage = TeamPickLaneMessage | TeamAddPlayerMessage | TeamTransferPlayerMessage;
+export type TeamMessage =
+	| TeamPickLaneMessage
+	| TeamAddPlayerMessage
+	| TeamTransferPlayerMessage
+	| TeamAutoAssignPlayerMessage;
 
 interface BaseMessage {
 	id: string;
@@ -35,6 +39,11 @@ export interface TeamTransferPlayerMessage extends BaseMessage {
 	command: 'TransferPlayer';
 	name: string;
 	team: Team | 'Unassigned';
+}
+
+export interface TeamAutoAssignPlayerMessage extends BaseMessage {
+	command: 'AutoAssignPlayer';
+	name: string;
 }
 
 export interface PlayerData {

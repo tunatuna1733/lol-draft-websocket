@@ -1,8 +1,10 @@
 import type { Server } from 'bun';
 import type { TeamPickLaneMessage } from '../../types/team';
 import { teams } from '../../data';
+import { publishTeamInfo } from '../../util';
 
 export const teamPickLane = (server: Server, data: TeamPickLaneMessage) => {
+	// TODO: auto assign player
 	const team = teams.find((t) => t.id === data.id);
 	if (!team) {
 		console.error(`Team not found. ID: ${data.id}`);
@@ -15,5 +17,5 @@ export const teamPickLane = (server: Server, data: TeamPickLaneMessage) => {
 		return;
 	}
 	player.lane = data.lane;
-	server.publish(id, JSON.stringify(team));
+	publishTeamInfo(server, team);
 };

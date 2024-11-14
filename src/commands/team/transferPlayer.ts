@@ -1,6 +1,7 @@
 import type { Server } from 'bun';
 import type { PlayerData, TeamTransferPlayerMessage } from '../../types/team';
 import { teams } from '../../data';
+import { publishTeamInfo } from '../../util';
 
 export const teamTransferPlayer = (server: Server, data: TeamTransferPlayerMessage) => {
 	const team = teams.find((t) => t.id === data.id);
@@ -36,5 +37,5 @@ export const teamTransferPlayer = (server: Server, data: TeamTransferPlayerMessa
 		return;
 	}
 	team[data.team].push(player);
-	server.publish(id, JSON.stringify(team));
+	publishTeamInfo(server, team);
 };
