@@ -94,6 +94,8 @@ export class DraftTimer {
 			};
 			this.broadcast(JSON.stringify(payload));
 			this.lastToggle = Date.now();
+			this.roomData.currentPhase.paused = true;
+			this.roomData.currentPhase.remainingTime = this.remainingTime;
 		}
 	};
 
@@ -118,6 +120,8 @@ export class DraftTimer {
 			};
 			this.broadcast(JSON.stringify(payload));
 			this.lastToggle = Date.now();
+			this.roomData.currentPhase.paused = false;
+			this.roomData.currentPhase.remainingTime = this.remainingTime;
 		}
 	};
 
