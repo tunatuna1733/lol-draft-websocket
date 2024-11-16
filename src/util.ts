@@ -35,6 +35,9 @@ export const publishTeamInfo = (server: Server, teamData: TeamCreationData) => {
 		}
 		return laneCompResult;
 	});
+	teamData.Blue = teamData.Blue.filter((elem, index) => {
+		return teamData.Blue.indexOf(elem) === index;
+	});
 	teamData.Red.sort((a, b) => {
 		const laneCompResult = compareLane(a.lane, b.lane);
 		if (laneCompResult === 0) {
@@ -42,8 +45,14 @@ export const publishTeamInfo = (server: Server, teamData: TeamCreationData) => {
 		}
 		return laneCompResult;
 	});
+	teamData.Red = teamData.Red.filter((elem, index) => {
+		return teamData.Red.indexOf(elem) === index;
+	});
 	teamData.Unassigned.sort((a, b) => {
 		return a.name.localeCompare(b.name);
+	});
+	teamData.Unassigned = teamData.Unassigned.filter((elem, index) => {
+		return teamData.Unassigned.indexOf(elem) === index;
 	});
 	const id = `team-${teamData.id}`;
 	server.publish(id, JSON.stringify(teamData));
