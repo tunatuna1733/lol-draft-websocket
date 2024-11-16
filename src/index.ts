@@ -76,6 +76,7 @@ const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 		return new Response('Hello World!');
 	},
 	websocket: {
+		idleTimeout: 600,
 		open(ws) {
 			if (ws.data.teamID) {
 				ws.subscribe(`team-${ws.data.teamID}`);
