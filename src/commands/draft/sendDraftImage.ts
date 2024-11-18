@@ -17,16 +17,18 @@ export const sendDraftImage = (data: DraftImageMessage) => {
 		return;
 	}
 	if (!timer.roomData.imageSent) {
-		const url = 'https://akali.tunatuna.dev/draftImage';
+		const url = `${process.env.IMAGE_ENDPOINT}/draftImage`;
 		const body: ImageBody = {
 			id: data.roomID,
 			image: data.image,
 		};
-		fetch(url, { method: 'POST', body: JSON.stringify(body) }).then(async (res) => {
-			const resJson: ImageResponse = await res.json();
-			if (resJson.success) {
-				timer.roomData.imageSent = true;
-			}
-		});
+		fetch(url, { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } }).then(
+			async (res) => {
+				const resJson: ImageResponse = await res.json();
+				if (resJson.success) {
+					timer.roomData.imageSent = true;
+				}
+			},
+		);
 	}
 };
