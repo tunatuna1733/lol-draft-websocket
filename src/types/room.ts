@@ -38,5 +38,6 @@ export interface RoomData {
 	starting: boolean;
 	started: boolean;
 	ended: boolean;
+	imageSent: boolean;
 	expire: number;
 }

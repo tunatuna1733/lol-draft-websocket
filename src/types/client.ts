@@ -11,7 +11,8 @@ type Commands =
 	| 'RemovePlayer'
 	| 'Toggle'
 	| 'AddNPC'
-	| 'SwapPlayers';
+	| 'SwapPlayers'
+	| 'DraftImage';
 
 export interface CreateRoomMessage {
 	roomName: string;
@@ -95,4 +96,9 @@ export interface SwapPlayersMessage extends BaseMessage {
 	team: Team;
 	index1: number;
 	index2: number;
+}
+
+export interface DraftImageMessage extends BaseMessage {
+	command: 'DraftImage';
+	image: string;
 }

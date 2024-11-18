@@ -33,6 +33,7 @@ export const createRoom = (data: CreateRoomMessage) => {
 		starting: false,
 		started: false,
 		ended: false,
+		imageSent: false,
 		expire: Date.now() + 20 * 60 * 1000,
 	};
 	rooms.push(roomData);

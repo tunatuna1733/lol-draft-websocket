@@ -8,6 +8,7 @@ import { ready } from './commands/draft/ready';
 import { removePlayer } from './commands/draft/removePlayer';
 import { selectBanChamp } from './commands/draft/selectBanChamp';
 import { selectChamp } from './commands/draft/selectChamp';
+import { sendDraftImage } from './commands/draft/sendDraftImage';
 import { swapPlayers } from './commands/draft/swapPlayer';
 import { togglePause } from './commands/draft/toggle';
 import { teamAddPlayer } from './commands/team/addPlayer';
@@ -19,6 +20,7 @@ import { teams } from './data';
 import type {
 	AddNPCMessage,
 	BaseMessage,
+	DraftImageMessage,
 	JoinMessage,
 	PickBanChampMessage,
 	PickChampMessage,
@@ -140,6 +142,9 @@ const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 						break;
 					case 'SwapPlayers':
 						swapPlayers(ws, parsedMessage as SwapPlayersMessage);
+						break;
+					case 'DraftImage':
+						sendDraftImage(parsedMessage as DraftImageMessage);
 						break;
 					default:
 						console.warn('Unknown command:', parsedMessage.command);
