@@ -10,6 +10,7 @@ export const createTeam = (data: CreateTeamPayload) => {
 		Blue: [],
 		Red: [],
 		Unassigned: data.players.map((p) => ({ ...p, lane: '' })),
+		draftId: '',
 	};
 	teams.push(teamCreationData);
 	return id;

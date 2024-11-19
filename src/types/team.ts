@@ -15,7 +15,8 @@ export type TeamMessage =
 	| TeamPickLaneMessage
 	| TeamAddPlayerMessage
 	| TeamTransferPlayerMessage
-	| TeamAutoAssignPlayerMessage;
+	| TeamAutoAssignPlayerMessage
+	| TeamCreateDraftMessage;
 
 interface BaseMessage {
 	id: string;
@@ -46,6 +47,10 @@ export interface TeamAutoAssignPlayerMessage extends BaseMessage {
 	name: string;
 }
 
+export interface TeamCreateDraftMessage extends BaseMessage {
+	command: 'CreateDraft';
+}
+
 export interface PlayerData {
 	name: string;
 	icon: string;
@@ -59,4 +64,5 @@ export interface TeamCreationData {
 	Blue: PlayerData[];
 	Red: PlayerData[];
 	Unassigned: PlayerData[];
+	draftId: string;
 }

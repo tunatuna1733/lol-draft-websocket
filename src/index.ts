@@ -13,6 +13,7 @@ import { swapPlayers } from './commands/draft/swapPlayer';
 import { togglePause } from './commands/draft/toggle';
 import { teamAddPlayer } from './commands/team/addPlayer';
 import { autoAssignPlayer } from './commands/team/autoAssignPlayer';
+import { createDraft } from './commands/team/createDraft';
 import { createTeam } from './commands/team/createTeam';
 import { teamPickLane } from './commands/team/pickLane';
 import { teamTransferPlayer } from './commands/team/transferPlayer';
@@ -32,28 +33,34 @@ import type {
 	SwapPlayersMessage,
 	ToggleMessage,
 } from './types/client';
-import type { CreateTeamPayload, TeamMessage } from './types/team';
+import type { CreateTeamPayload, TeamCreationData, TeamMessage } from './types/team';
 import { parseCookie } from './util';
 
 const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 	port: 443,
 	async fetch(req, server) {
 		const url = new URL(req.url);
-		if (url.pathname === '/createRoom') {
+		if (req.method === 'POST' && url.pathname === '/createRoom') {
 			const params = url.searchParams;
 			const matchName = params.get('matchName') || 'Custom Match';
 			const team1Name = params.get('team1Name') || 'Team 1';
 			const team2Name = params.get('team2Name') || 'Team 2';
-			const id = createRoom({
-				roomName: matchName,
-				team1Name,
-				team2Name,
-			});
+			const contentLength = req.headers.get('Content-Length');
+			const data: TeamCreationData | null = contentLength && contentLength !== '0' && (await req.json());
+			const teamData = data && { Blue: data.Blue, Red: data.Red };
+			const id = createRoom(
+				{
+					roomName: matchName,
+					team1Name,
+					team2Name,
+				},
+				teamData,
+			);
 			const response = new Response(JSON.stringify({ id }));
 			if (req.headers.get('Origin') === 'http://localhost:3000')
 				response.headers.set('Access-Control-Allow-Origin', 'http://localhost:3000');
 			else response.headers.set('Access-Control-Allow-Origin', 'https://lol.tunatuna.dev');
-			response.headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+			response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
 			response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
 			return response;
 		}
@@ -103,6 +110,9 @@ const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 						break;
 					case 'AutoAssignPlayer':
 						autoAssignPlayer(parsedMessage, server);
+						break;
+					case 'CreateDraft':
+						createDraft(server, parsedMessage.id);
 						break;
 					default:
 						console.warn('Unknown command');

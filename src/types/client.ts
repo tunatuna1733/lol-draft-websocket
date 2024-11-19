@@ -31,6 +31,7 @@ export interface JoinMessage extends BaseMessage {
 	team: Team;
 	isSpec?: boolean;
 	beginner?: boolean;
+	bypass?: boolean;
 }
 
 export interface ReadyMessage extends BaseMessage {

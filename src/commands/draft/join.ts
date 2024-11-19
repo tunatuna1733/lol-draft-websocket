@@ -24,6 +24,11 @@ export const join = (ws: ServerWebSocket<unknown>, data: JoinMessage, server: Se
 		ws.subscribe(roomData.id);
 		return;
 	}
+	if (data.bypass) {
+		ws.subscribe(roomData.id);
+		ws.send(JSON.stringify(roomData));
+		return;
+	}
 	const player: PlayerData = {
 		name: data.name,
 		team: data.team,
