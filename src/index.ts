@@ -54,6 +54,7 @@ const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 					team1Name,
 					team2Name,
 				},
+				undefined,
 				teamData,
 			);
 			const response = new Response(JSON.stringify({ id }));

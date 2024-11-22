@@ -40,4 +40,5 @@ export interface RoomData {
 	ended: boolean;
 	imageSent: boolean;
 	expire: number;
+	channelId?: string;
 }

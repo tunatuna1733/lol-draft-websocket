@@ -4,7 +4,11 @@ import type { RoomData } from '../../types/room';
 import { rooms } from '../../data';
 import type { PlayerData } from '../../types/team';
 
-export const createRoom = (data: CreateRoomMessage, teamData?: { Blue: PlayerData[]; Red: PlayerData[] } | null) => {
+export const createRoom = (
+	data: CreateRoomMessage,
+	channelId?: string,
+	teamData?: { Blue: PlayerData[]; Red: PlayerData[] } | null,
+) => {
 	const id = generateRandomString();
 	const roomData: RoomData = {
 		id,
@@ -54,6 +58,7 @@ export const createRoom = (data: CreateRoomMessage, teamData?: { Blue: PlayerDat
 		ended: false,
 		imageSent: false,
 		expire: Date.now() + 20 * 60 * 1000,
+		channelId,
 	};
 	rooms.push(roomData);
 	return id;

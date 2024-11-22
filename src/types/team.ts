@@ -9,6 +9,7 @@ export interface CreateTeamPlayer {
 
 export interface CreateTeamPayload {
 	players: CreateTeamPlayer[];
+	channelId?: string;
 }
 
 export type TeamMessage =
@@ -61,6 +62,7 @@ export interface PlayerData {
 export interface TeamCreationData {
 	id: string;
 	createdTime: number;
+	channelId?: string;
 	Blue: PlayerData[];
 	Red: PlayerData[];
 	Unassigned: PlayerData[];

@@ -7,6 +7,7 @@ export const createTeam = (data: CreateTeamPayload) => {
 	const teamCreationData: TeamCreationData = {
 		id,
 		createdTime: Date.now(),
+		channelId: data.channelId,
 		Blue: [],
 		Red: [],
 		Unassigned: data.players.map((p) => ({ ...p, lane: '' })),

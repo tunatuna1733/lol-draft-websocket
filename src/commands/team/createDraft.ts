@@ -9,7 +9,11 @@ export const createDraft = (server: Server, teamId: string) => {
 		console.error(`[CreateDraft]Team not found. ID: ${teamId}`);
 		return;
 	}
-	const draftId = createRoom({ roomName: 'Custom Match', team1Name: 'Team 1', team2Name: 'Team 2' }, team);
+	const draftId = createRoom(
+		{ roomName: 'Custom Match', team1Name: 'Team 1', team2Name: 'Team 2' },
+		team.channelId,
+		team,
+	);
 	team.draftId = draftId;
 	publishTeamInfo(server, team);
 };

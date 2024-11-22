@@ -102,4 +102,5 @@ export interface SwapPlayersMessage extends BaseMessage {
 export interface DraftImageMessage extends BaseMessage {
 	command: 'DraftImage';
 	image: string;
+	channelId?: string;
 }
