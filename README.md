@@ -1,15 +1,20 @@
 # lol-draft-websocket
 
-To install dependencies:
+This is the websocket backend server for [LoL Custom Tools](https://lol.tunatuna.dev) built on top of [`Bun.serve` feature](https://bun.sh/docs/api/http).
 
-```bash
-bun install
+## Tech Stack
+- [Bun](https://bun.sh/) (JavaScript runtime)
+
+## Structure
 ```
-
-To run:
-
-```bash
-bun run index.ts
+└─src
+    │  data.ts  : State management
+    │  draft.ts : Main class for managing draft
+    │  index.ts : Entry point
+    │  util.ts  : Misc utility functions
+    │
+    ├─commands
+    │  ├─draft  : Commands for draft tool
+    │  └─team   : Commands for team creation tool
+    └─types     : Type definitions
 ```
-
-This project was created using `bun init` in bun v1.1.30. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
