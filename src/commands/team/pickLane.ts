@@ -1,6 +1,6 @@
 import type { Server } from 'bun';
-import type { TeamPickLaneMessage } from '../../types/team';
 import { teams } from '../../data';
+import type { TeamPickLaneMessage } from '../../types/team';
 import { publishTeamInfo } from '../../util';
 import { autoAssignPlayer } from './autoAssignPlayer';
 
@@ -16,6 +16,6 @@ export const teamPickLane = (server: Server, data: TeamPickLaneMessage) => {
 		return;
 	}
 	player.lane = data.lane;
-	autoAssignPlayer({ command: 'AutoAssignPlayer', id: data.id, name: player.name });
+	if (player.lane !== '') autoAssignPlayer({ command: 'AutoAssignPlayer', id: data.id, name: player.name });
 	publishTeamInfo(server, team);
 };

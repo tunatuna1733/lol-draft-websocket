@@ -26,7 +26,7 @@ interface BaseMessage {
 export interface TeamPickLaneMessage extends BaseMessage {
 	command: 'PickLane';
 	name: string;
-	lane: Lane;
+	lane: Blankable<Lane>;
 }
 
 export interface TeamAddPlayerMessage extends BaseMessage {

@@ -20,3 +20,5 @@ setInterval(() => {
 	// same for team creation rooms
 	teams = teams.filter((t) => Date.now() - t.createdTime < 20 * 60 * 1000);
 }, 120 * 1000);
+
+setInterval(() => {}, 30 * 1000);
