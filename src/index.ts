@@ -36,7 +36,7 @@ import type {
 import type { CreateTeamPayload, TeamCreationData, TeamMessage } from './types/team';
 import { parseCookie } from './util';
 
-const server = Bun.serve<{ roomID?: string; teamID?: string }>({
+export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 	port: 443,
 	async fetch(req, server) {
 		const url = new URL(req.url);

@@ -1,3 +1,4 @@
+import { server } from '.';
 import type { DraftTimer } from './draft';
 import type { RoomData } from './types/room';
 import type { TeamCreationData } from './types/team';
@@ -21,4 +22,11 @@ setInterval(() => {
 	teams = teams.filter((t) => Date.now() - t.createdTime < 20 * 60 * 1000);
 }, 120 * 1000);
 
-setInterval(() => {}, 30 * 1000);
+setInterval(() => {
+	for (const timer of Object.values(timers)) {
+		timer.broadcast('KeepAlive');
+	}
+	for (const team of teams) {
+		server.publish(`team-${team.id}`, 'KeepAlive');
+	}
+}, 30 * 1000);

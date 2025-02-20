@@ -1,6 +1,6 @@
 import type { ServerWebSocket } from 'bun';
-import type { CurrentPhase, StartPhase } from './types/server';
 import type { PhaseData, RoomData } from './types/room';
+import type { CurrentPhase, StartPhase } from './types/server';
 
 export class DraftTimer {
 	steps = [
@@ -139,7 +139,7 @@ export class DraftTimer {
 		}
 	};
 
-	private broadcast = (payload: string) => {
+	broadcast = (payload: string) => {
 		this.ws.send(payload);
 		this.ws.publish(this.roomData.id, payload);
 	};
