@@ -1,8 +1,8 @@
-import type { CreateRoomMessage } from '../../types/client';
-import { generateRandomString } from '../../util';
-import type { RoomData } from '../../types/room';
 import { rooms } from '../../data';
+import type { CreateRoomMessage } from '../../types/client';
+import type { RoomData } from '../../types/room';
 import type { PlayerData } from '../../types/team';
+import { generateRandomString } from '../../util';
 
 export const createRoom = (
 	data: CreateRoomMessage,
@@ -57,7 +57,7 @@ export const createRoom = (
 		started: false,
 		ended: false,
 		imageSent: false,
-		expire: Date.now() + 20 * 60 * 1000,
+		expire: Date.now() + 60 * 60 * 1000,
 		channelId,
 	};
 	rooms.push(roomData);
