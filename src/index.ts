@@ -9,6 +9,7 @@ import { removePlayer } from './commands/draft/removePlayer';
 import { selectBanChamp } from './commands/draft/selectBanChamp';
 import { selectChamp } from './commands/draft/selectChamp';
 import { sendDraftImage } from './commands/draft/sendDraftImage';
+import { start } from './commands/draft/start';
 import { swapPlayers } from './commands/draft/swapPlayer';
 import { togglePause } from './commands/draft/toggle';
 import { teamAddPlayer } from './commands/team/addPlayer';
@@ -30,6 +31,7 @@ import type {
 	RemovePlayerMessage,
 	SelectBanChampMessage,
 	SelectChampMessage,
+	StartMessage,
 	SwapPlayersMessage,
 	ToggleMessage,
 } from './types/client';
@@ -126,6 +128,9 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 						break;
 					case 'Ready':
 						ready(ws, parsedMessage as ReadyMessage);
+						break;
+					case 'Start':
+						start(ws, parsedMessage as StartMessage);
 						break;
 					case 'SelectBanChamp':
 						selectBanChamp(ws, parsedMessage as SelectBanChampMessage);

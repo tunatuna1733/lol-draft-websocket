@@ -3,6 +3,7 @@ import type { Lane, Team } from './lol';
 type Commands =
 	| 'Join'
 	| 'Ready'
+	| 'Start'
 	| 'SelectBanChamp'
 	| 'PickBanChamp'
 	| 'SelectChamp'
@@ -38,6 +39,10 @@ export interface ReadyMessage extends BaseMessage {
 	command: 'Ready';
 	team: Team;
 	isReady: boolean;
+}
+
+export interface StartMessage extends BaseMessage {
+	command: 'Start';
 }
 
 export interface SelectBanChampMessage extends BaseMessage {
