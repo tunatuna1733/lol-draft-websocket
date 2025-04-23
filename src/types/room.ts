@@ -41,4 +41,5 @@ export interface RoomData {
 	imageSent: boolean;
 	expire: number;
 	channelId?: string;
+	globalBans: string[];
 }

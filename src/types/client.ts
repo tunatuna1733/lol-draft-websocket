@@ -13,7 +13,8 @@ type Commands =
 	| 'Toggle'
 	| 'AddNPC'
 	| 'SwapPlayers'
-	| 'DraftImage';
+	| 'DraftImage'
+	| 'SetGlobalBans';
 
 export interface CreateRoomMessage {
 	roomName: string;
@@ -108,4 +109,9 @@ export interface DraftImageMessage extends BaseMessage {
 	command: 'DraftImage';
 	image: string;
 	channelId?: string;
+}
+
+export interface SetGlobalBansMessage extends BaseMessage {
+	command: 'SetGlobalBans';
+	bans: string[];
 }

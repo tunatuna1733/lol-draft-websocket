@@ -9,6 +9,7 @@ import { removePlayer } from './commands/draft/removePlayer';
 import { selectBanChamp } from './commands/draft/selectBanChamp';
 import { selectChamp } from './commands/draft/selectChamp';
 import { sendDraftImage } from './commands/draft/sendDraftImage';
+import { setGlobalBans } from './commands/draft/setGlobalBans';
 import { start } from './commands/draft/start';
 import { swapPlayers } from './commands/draft/swapPlayer';
 import { togglePause } from './commands/draft/toggle';
@@ -31,6 +32,7 @@ import type {
 	RemovePlayerMessage,
 	SelectBanChampMessage,
 	SelectChampMessage,
+	SetGlobalBansMessage,
 	StartMessage,
 	SwapPlayersMessage,
 	ToggleMessage,
@@ -161,6 +163,9 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 						break;
 					case 'DraftImage':
 						sendDraftImage(parsedMessage as DraftImageMessage);
+						break;
+					case 'SetGlobalBans':
+						setGlobalBans(ws, parsedMessage as SetGlobalBansMessage);
 						break;
 					default:
 						console.warn('Unknown command:', parsedMessage.command);
