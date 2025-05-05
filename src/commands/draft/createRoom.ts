@@ -58,7 +58,9 @@ export const createRoom = (
 		ended: false,
 		imageSent: false,
 		expire: Date.now() + 60 * 60 * 1000,
+		globalBans: [],
 		channelId,
+		fearlessId: generateRandomString(),
 	};
 	rooms.push(roomData);
 	return id;

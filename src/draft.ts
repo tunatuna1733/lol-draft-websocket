@@ -1,4 +1,5 @@
 import type { ServerWebSocket } from 'bun';
+import { insertFearlessBans } from './db';
 import type { PhaseData, RoomData } from './types/room';
 import type { CurrentPhase, StartPhase } from './types/server';
 
@@ -47,6 +48,10 @@ export class DraftTimer {
 	startPhase = () => {
 		if (this.currentStep === this.steps.length) {
 			this.roomData.ended = true;
+			const fearlessId = this.roomData.fearlessId;
+			const redChamps = this.roomData.teams.Red.players.map((p) => p.champ);
+			const blueChamps = this.roomData.teams.Blue.players.map((p) => p.champ);
+			insertFearlessBans(fearlessId, { red: redChamps, blue: blueChamps });
 			this.broadcast(JSON.stringify(this.roomData));
 			return;
 		}

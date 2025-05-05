@@ -20,6 +20,7 @@ import { createTeam } from './commands/team/createTeam';
 import { teamPickLane } from './commands/team/pickLane';
 import { teamTransferPlayer } from './commands/team/transferPlayer';
 import { teams } from './data';
+import { getFearlessBans } from './db';
 import type {
 	AddNPCMessage,
 	BaseMessage,
@@ -38,7 +39,6 @@ import type {
 	ToggleMessage,
 } from './types/client';
 import type { CreateTeamPayload, TeamCreationData, TeamMessage } from './types/team';
-import { parseCookie } from './util';
 
 export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 	port: 443,
@@ -80,14 +80,25 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 			response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
 			return response;
 		}
-		const cookies = req.headers.get('cookies');
-		const roomID = cookies && parseCookie(cookies).roomID;
-		const teamID = new URL(req.url).searchParams.get('teamID');
-		const success = server.upgrade(req, { data: { roomID, teamID } });
-		if (success) {
-			return undefined;
+		if (req.method === 'GET' && url.pathname === '/fearless') {
+			const params = url.searchParams;
+			const fearlessID = params.get('fearlessID');
+			if (!fearlessID) {
+				return new Response('Missing fearless id', { status: 400 });
+			}
+			const fearlessBans = await getFearlessBans(fearlessID);
+			if (!fearlessBans) {
+				return new Response('No document found for the fearless id', { status: 404 });
+			}
+			const response = new Response(JSON.stringify({ red: fearlessBans.red, blue: fearlessBans.blue }));
+			if (req.headers.get('Origin') === 'http://localhost:3000')
+				response.headers.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+			else response.headers.set('Access-Control-Allow-Origin', 'https://lol.tunatuna.dev');
+			response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+			response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+			return response;
 		}
-		return new Response('Hello World!');
+		return new Response('Go away');
 	},
 	websocket: {
 		idleTimeout: 600,
