@@ -1,5 +1,5 @@
 export type Fearless = {
-	fearlessID: string;
+	fearlessId: string;
 	red: string[];
 	blue: string[];
 	created: number;

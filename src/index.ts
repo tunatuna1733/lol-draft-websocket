@@ -19,8 +19,7 @@ import { createDraft } from './commands/team/createDraft';
 import { createTeam } from './commands/team/createTeam';
 import { teamPickLane } from './commands/team/pickLane';
 import { teamTransferPlayer } from './commands/team/transferPlayer';
-import { teams } from './data';
-import { getFearlessBans } from './db';
+import { fearlessRecords, teams } from './data';
 import type {
 	AddNPCMessage,
 	BaseMessage,
@@ -86,7 +85,7 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 			if (!fearlessID) {
 				return new Response('Missing fearless id', { status: 400 });
 			}
-			const fearlessBans = await getFearlessBans(fearlessID);
+			const fearlessBans = fearlessRecords.find((f) => f.fearlessId === fearlessID);
 			if (!fearlessBans) {
 				return new Response('No document found for the fearless id', { status: 404 });
 			}
@@ -94,7 +93,7 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 			if (req.headers.get('Origin') === 'http://localhost:3000')
 				response.headers.set('Access-Control-Allow-Origin', 'http://localhost:3000');
 			else response.headers.set('Access-Control-Allow-Origin', 'https://lol.tunatuna.dev');
-			response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+			response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
 			response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
 			return response;
 		}
