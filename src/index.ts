@@ -80,7 +80,7 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 			response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
 			return response;
 		}
-		if (req.method === 'POST' && url.pathname === '/fearless') {
+		if (req.method === 'GET' && url.pathname === '/fearless') {
 			const params = url.searchParams;
 			const fearlessID = params.get('fearlessID');
 			if (!fearlessID) {
