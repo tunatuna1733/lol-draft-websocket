@@ -38,6 +38,7 @@ import type {
 	ToggleMessage,
 } from './types/client';
 import type { CreateTeamPayload, TeamCreationData, TeamMessage } from './types/team';
+import { parseCookie } from './util';
 
 export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 	port: 443,
@@ -79,7 +80,7 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 			response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
 			return response;
 		}
-		if (req.method === 'GET' && url.pathname === '/fearless') {
+		if (req.method === 'POST' && url.pathname === '/fearless') {
 			const params = url.searchParams;
 			const fearlessID = params.get('fearlessID');
 			if (!fearlessID) {
@@ -96,6 +97,13 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 			response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
 			response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
 			return response;
+		}
+		const cookies = req.headers.get('cookies');
+		const roomID = cookies && parseCookie(cookies).roomID;
+		const teamID = new URL(req.url).searchParams.get('teamID');
+		const success = server.upgrade(req, { data: { roomID, teamID } });
+		if (success) {
+			return undefined;
 		}
 		return new Response('Go away');
 	},
