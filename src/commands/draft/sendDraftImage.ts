@@ -5,6 +5,7 @@ type ImageBody = {
 	id: string;
 	image: string;
 	channelId?: string;
+	fearlessId: string;
 };
 
 type ImageResponse = {
@@ -24,6 +25,7 @@ export const sendDraftImage = (data: DraftImageMessage) => {
 			id: data.roomID,
 			image: data.image,
 			channelId: data.channelId,
+			fearlessId: data.fearlessId,
 		};
 		fetch(url, { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } }).then(
 			async (res) => {
