@@ -2,10 +2,14 @@
   "name": "lol-draft-websocket",
   "module": "src/index.ts",
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "mongodb": "^6.17.0"
+  }
 }

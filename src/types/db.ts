@@ -1,11 +1,17 @@
-export type Fearless = {
+export type DraftRecord = {
 	fearlessId: string;
-	red: string[];
-	blue: string[];
+	bans: {
+		blue: string[];
+		red: string[];
+	};
+	picks: {
+		blue: string[];
+		red: string[];
+	};
 	created: number;
 };
 
-export type FearlessRequestData = {
+export type SearchRequestData = {
 	red: string[];
 	blue: string[];
 };

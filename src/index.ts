@@ -19,7 +19,8 @@ import { createDraft } from './commands/team/createDraft';
 import { createTeam } from './commands/team/createTeam';
 import { teamPickLane } from './commands/team/pickLane';
 import { teamTransferPlayer } from './commands/team/transferPlayer';
-import { fearlessRecords, teams } from './data';
+import { teams } from './data';
+import { MongoDBClient } from './db';
 import type {
 	AddNPCMessage,
 	BaseMessage,
@@ -37,8 +38,12 @@ import type {
 	SwapPlayersMessage,
 	ToggleMessage,
 } from './types/client';
+import type { SearchRequestData } from './types/db';
 import type { CreateTeamPayload, TeamCreationData, TeamMessage } from './types/team';
 import { parseCookie } from './util';
+
+export const dbClient = new MongoDBClient();
+await dbClient.init();
 
 export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 	port: 443,
@@ -86,11 +91,29 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 			if (!fearlessID) {
 				return new Response('Missing fearless id', { status: 400 });
 			}
-			const fearlessBans = fearlessRecords.find((f) => f.fearlessId === fearlessID);
+			const fearlessBans = await dbClient.getFearlessBans(fearlessID);
 			if (!fearlessBans) {
 				return new Response('No document found for the fearless id', { status: 404 });
 			}
-			const response = new Response(JSON.stringify({ red: fearlessBans.red, blue: fearlessBans.blue }));
+			const response = new Response(JSON.stringify({ red: fearlessBans.bans.red, blue: fearlessBans.bans.blue }));
+			if (req.headers.get('Origin') === 'http://localhost:3000')
+				response.headers.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+			else response.headers.set('Access-Control-Allow-Origin', 'https://lol.tunatuna.dev');
+			response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+			response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+			return response;
+		}
+		if (req.method === 'POST' && url.pathname === '/searchBans') {
+			const contentLength = req.headers.get('Content-Length');
+			const data: SearchRequestData | null = contentLength && contentLength !== '0' && (await req.json());
+			if (!data) {
+				return new Response('No data provided', { status: 400 });
+			}
+			const result = await dbClient.getBans(data);
+			if (!result) {
+				return new Response('No bans found', { status: 404 });
+			}
+			const response = new Response(JSON.stringify(result));
 			if (req.headers.get('Origin') === 'http://localhost:3000')
 				response.headers.set('Access-Control-Allow-Origin', 'http://localhost:3000');
 			else response.headers.set('Access-Control-Allow-Origin', 'https://lol.tunatuna.dev');
