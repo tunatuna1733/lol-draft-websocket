@@ -1,7 +1,7 @@
 import type { ServerWebSocket } from 'bun';
-import type { AddNPCMessage } from '../../types/client';
 import { rooms } from '../../data';
-import type { PlayerData } from '../../types/room';
+import type { AddNPCMessage } from '../../types/client';
+import type { DraftPlayerData } from '../../types/room';
 import type { ResultMessage } from '../../types/server';
 
 export const addNPC = (ws: ServerWebSocket<unknown>, data: AddNPCMessage) => {
@@ -14,7 +14,7 @@ export const addNPC = (ws: ServerWebSocket<unknown>, data: AddNPCMessage) => {
 		ws.send(JSON.stringify(error));
 		return;
 	}
-	const player: PlayerData = {
+	const player: DraftPlayerData = {
 		name: data.name,
 		team: data.team,
 		lane: '',

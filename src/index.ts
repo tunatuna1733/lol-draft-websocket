@@ -15,6 +15,7 @@ import { swapPlayers } from './commands/draft/swapPlayer';
 import { togglePause } from './commands/draft/toggle';
 import { teamAddPlayer } from './commands/team/addPlayer';
 import { autoAssignPlayer } from './commands/team/autoAssignPlayer';
+import { teamBalance } from './commands/team/balance';
 import { createDraft } from './commands/team/createDraft';
 import { createTeam } from './commands/team/createTeam';
 import { teamPickLane } from './commands/team/pickLane';
@@ -159,6 +160,9 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 						break;
 					case 'CreateDraft':
 						createDraft(server, parsedMessage.id);
+						break;
+					case 'Balance':
+						teamBalance(server, parsedMessage);
 						break;
 					default:
 						console.warn('Unknown command');

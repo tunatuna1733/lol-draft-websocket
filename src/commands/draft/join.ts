@@ -1,7 +1,7 @@
 import type { Server, ServerWebSocket } from 'bun';
-import type { JoinMessage } from '../../types/client';
 import { rooms } from '../../data';
-import type { PlayerData } from '../../types/room';
+import type { JoinMessage } from '../../types/client';
+import type { DraftPlayerData } from '../../types/room';
 import type { MakeSpec, ResultMessage } from '../../types/server';
 
 export const join = (ws: ServerWebSocket<unknown>, data: JoinMessage, server: Server) => {
@@ -29,7 +29,7 @@ export const join = (ws: ServerWebSocket<unknown>, data: JoinMessage, server: Se
 		ws.send(JSON.stringify(roomData));
 		return;
 	}
-	const player: PlayerData = {
+	const player: DraftPlayerData = {
 		name: data.name,
 		team: data.team,
 		lane: '',

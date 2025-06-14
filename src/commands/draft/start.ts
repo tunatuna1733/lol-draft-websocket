@@ -23,7 +23,6 @@ export const start = (ws: ServerWebSocket<unknown>, data: StartMessage) => {
 				lane: '',
 				champ: '',
 				isNPC: true,
-				isBeginner: false,
 			});
 		}
 		while (roomData.teams.Red.players.length < 5) {
@@ -33,7 +32,6 @@ export const start = (ws: ServerWebSocket<unknown>, data: StartMessage) => {
 				lane: '',
 				champ: '',
 				isNPC: true,
-				isBeginner: false,
 			});
 		}
 		// start draft

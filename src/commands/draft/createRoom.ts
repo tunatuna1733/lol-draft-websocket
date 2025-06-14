@@ -30,7 +30,6 @@ export const createRoom = (
 							team: 'Blue',
 							lane: b.lane,
 							champ: '',
-							isBeginner: b.beginner,
 							isNPC: false,
 						}))
 					: [],
@@ -45,7 +44,6 @@ export const createRoom = (
 							team: 'Red',
 							lane: r.lane,
 							champ: '',
-							isBeginner: r.beginner,
 							isNPC: false,
 						}))
 					: [],

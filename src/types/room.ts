@@ -1,13 +1,12 @@
 import type { Lane, Team } from './lol';
 import type { Blankable } from './util';
 
-export interface PlayerData {
+export interface DraftPlayerData {
 	name: string;
 	team: Team;
 	lane: Blankable<Lane>;
 	champ: string;
 	isNPC: boolean;
-	isBeginner: boolean;
 }
 
 export interface PhaseData {
@@ -21,7 +20,7 @@ export interface PhaseData {
 
 interface TeamData {
 	name: string;
-	players: PlayerData[];
+	players: DraftPlayerData[];
 	bans: string[];
 	isReady: boolean;
 }

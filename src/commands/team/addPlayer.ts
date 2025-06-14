@@ -1,6 +1,6 @@
 import type { Server } from 'bun';
-import type { TeamAddPlayerMessage } from '../../types/team';
 import { teams } from '../../data';
+import type { TeamAddPlayerMessage } from '../../types/team';
 import { publishTeamInfo } from '../../util';
 
 export const teamAddPlayer = (server: Server, data: TeamAddPlayerMessage) => {
@@ -9,6 +9,6 @@ export const teamAddPlayer = (server: Server, data: TeamAddPlayerMessage) => {
 		console.error(`[AddPlayer]Team not found. ID: ${data.id}`);
 		return;
 	}
-	team.Unassigned.push({ name: data.name, icon: data.icon, lane: data.lane, beginner: data.beginner });
+	team.Unassigned.push({ name: data.name, icon: data.icon, lane: data.lane, level: 0, elo: 0 });
 	publishTeamInfo(server, team);
 };
