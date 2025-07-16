@@ -15,3 +15,8 @@ export type SearchRequestData = {
 	red: string[];
 	blue: string[];
 };
+
+export type ResultDetailRecord = {
+	gameID: number;
+	data: never;
+};

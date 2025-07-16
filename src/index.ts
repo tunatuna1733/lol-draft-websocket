@@ -39,7 +39,7 @@ import type {
 	SwapPlayersMessage,
 	ToggleMessage,
 } from './types/client';
-import type { SearchRequestData } from './types/db';
+import type { ResultDetailRecord, SearchRequestData } from './types/db';
 import type { CreateTeamPayload, TeamCreationData, TeamMessage } from './types/team';
 import { parseCookie } from './util';
 
@@ -115,6 +115,42 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 				return new Response('No bans found', { status: 404 });
 			}
 			const response = new Response(JSON.stringify(result));
+			if (req.headers.get('Origin') === 'http://localhost:3000')
+				response.headers.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+			else response.headers.set('Access-Control-Allow-Origin', 'https://lol.tunatuna.dev');
+			response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+			response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+			return response;
+		}
+		if (req.method === 'POST' && url.pathname === '/details') {
+			const contentLength = req.headers.get('Content-Length');
+			const data: ResultDetailRecord = contentLength && contentLength !== '0' && (await req.json());
+			if (!data) {
+				return new Response('No data provided', { status: 400 });
+			}
+			const result = await dbClient.insertResultDetail(data.gameID, data.data);
+			if (!result) {
+				return new Response('Failed to insert result detail', { status: 500 });
+			}
+			const response = new Response(JSON.stringify(result));
+			if (req.headers.get('Origin') === 'http://localhost:3000')
+				response.headers.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+			else response.headers.set('Access-Control-Allow-Origin', 'https://lol.tunatuna.dev');
+			response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+			response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+			return response;
+		}
+		if (req.method === 'GET' && url.pathname === '/details') {
+			const params = url.searchParams;
+			const gameID = params.get('gameID');
+			if (!gameID) {
+				return new Response('Missing game id', { status: 400 });
+			}
+			const result = await dbClient.getResultDetail(Number.parseInt(gameID));
+			if (!result) {
+				return new Response('No document found for the game id', { status: 404 });
+			}
+			const response = new Response(JSON.stringify(result.data));
 			if (req.headers.get('Origin') === 'http://localhost:3000')
 				response.headers.set('Access-Control-Allow-Origin', 'http://localhost:3000');
 			else response.headers.set('Access-Control-Allow-Origin', 'https://lol.tunatuna.dev');

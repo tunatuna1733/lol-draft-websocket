@@ -1,9 +1,10 @@
 import { type Collection, MongoClient, ServerApiVersion } from 'mongodb';
-import type { DraftRecord } from './types/db';
+import type { DraftRecord, ResultDetailRecord } from './types/db';
 
 export class MongoDBClient {
 	client: MongoClient;
 	draftRecords?: Collection<DraftRecord>;
+	resultDetailRecords?: Collection<ResultDetailRecord>;
 
 	constructor() {
 		const mongoURI = Bun.env.MONGO_URI || '';
@@ -19,6 +20,7 @@ export class MongoDBClient {
 	init = async () => {
 		await this.client.connect();
 		this.draftRecords = this.client.db('lol-bp').collection<DraftRecord>('draft');
+		this.resultDetailRecords = this.client.db('lol-bp').collection<ResultDetailRecord>('details');
 	};
 
 	getFearlessBans = async (fearlessId: string) => {
@@ -59,5 +61,24 @@ export class MongoDBClient {
 		} catch (_) {
 			return false;
 		}
+	};
+
+	insertResultDetail = async (gameID: number, data: never) => {
+		if (!this.resultDetailRecords) return false;
+		try {
+			await this.resultDetailRecords.insertOne({
+				gameID,
+				data,
+			});
+			return true;
+		} catch (_) {
+			return false;
+		}
+	};
+
+	getResultDetail = async (gameID: number) => {
+		if (!this.resultDetailRecords) return;
+		const result = await this.resultDetailRecords.findOne({ gameID });
+		return result;
 	};
 }
