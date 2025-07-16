@@ -66,11 +66,15 @@ export class MongoDBClient {
 	insertResultDetail = async (gameID: number, data: never) => {
 		if (!this.resultDetailRecords) return false;
 		try {
-			await this.resultDetailRecords.insertOne({
-				gameID,
-				data,
-			});
-			return true;
+			const res = await this.getResultDetail(gameID);
+			if (!res) {
+				await this.resultDetailRecords.insertOne({
+					gameID,
+					data,
+				});
+				return true;
+			}
+			return false;
 		} catch (_) {
 			return false;
 		}
