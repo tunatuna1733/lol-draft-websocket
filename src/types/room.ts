@@ -42,4 +42,5 @@ export interface RoomData {
 	channelId?: string;
 	globalBans: string[];
 	fearlessId: string;
+	noPause: boolean;
 }

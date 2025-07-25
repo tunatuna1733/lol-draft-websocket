@@ -93,7 +93,7 @@ export class DraftTimer {
 	};
 
 	pause = () => {
-		if (Date.now() - this.lastToggle > 2 * 1000) {
+		if (this.roomData.noPause === false && Date.now() - this.lastToggle > 2 * 1000) {
 			const step = this.steps[this.currentStep - 1];
 			clearTimeout(this.timerId);
 			this.remainingTime = this.remainingTime - (Date.now() - this.stepStartTime);

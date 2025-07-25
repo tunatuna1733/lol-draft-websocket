@@ -6,6 +6,7 @@ import { generateRandomString } from '../../util';
 
 export const createRoom = (
 	data: CreateRoomMessage,
+	noPause: boolean,
 	channelId?: string,
 	teamData?: { Blue: PlayerData[]; Red: PlayerData[] } | null,
 ) => {
@@ -59,6 +60,7 @@ export const createRoom = (
 		globalBans: [],
 		channelId,
 		fearlessId: generateRandomString(),
+		noPause,
 	};
 	rooms.push(roomData);
 	return id;

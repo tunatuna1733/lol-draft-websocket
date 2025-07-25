@@ -55,6 +55,7 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 			const matchName = params.get('matchName') || 'Custom Match';
 			const team1Name = params.get('team1Name') || 'Team 1';
 			const team2Name = params.get('team2Name') || 'Team 2';
+			const noPause = params.get('noPause') === 'true';
 			const contentLength = req.headers.get('Content-Length');
 			const data: TeamCreationData | null = contentLength && contentLength !== '0' && (await req.json());
 			const teamData = data && { Blue: data.Blue, Red: data.Red };
@@ -64,6 +65,7 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 					team1Name,
 					team2Name,
 				},
+				noPause,
 				undefined,
 				teamData,
 			);
