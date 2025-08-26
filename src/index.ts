@@ -98,7 +98,7 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 			if (!fearlessBans) {
 				return new Response('No document found for the fearless id', { status: 404 });
 			}
-			const response = new Response(JSON.stringify({ red: fearlessBans.bans.red, blue: fearlessBans.bans.blue }));
+			const response = new Response(JSON.stringify({ red: fearlessBans.picks.red, blue: fearlessBans.picks.blue }));
 			if (req.headers.get('Origin') === 'http://localhost:3000')
 				response.headers.set('Access-Control-Allow-Origin', 'http://localhost:3000');
 			else response.headers.set('Access-Control-Allow-Origin', 'https://lol.tunatuna.dev');
