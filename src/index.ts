@@ -22,6 +22,7 @@ import { teamPickLane } from './commands/team/pickLane';
 import { teamTransferPlayer } from './commands/team/transferPlayer';
 import { teams } from './data';
 import { MongoDBClient } from './db';
+import { buildRandom, getItemList } from './item';
 import type {
 	AddNPCMessage,
 	BaseMessage,
@@ -153,6 +154,22 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 				return new Response('No document found for the game id', { status: 404 });
 			}
 			const response = new Response(JSON.stringify(result.data));
+			if (req.headers.get('Origin') === 'http://localhost:3000')
+				response.headers.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+			else response.headers.set('Access-Control-Allow-Origin', 'https://lol.tunatuna.dev');
+			response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+			response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+			return response;
+		}
+		if (req.method === 'GET' && url.pathname === '/build') {
+			const params = url.searchParams;
+			const noAD = params.get('noAD') === 'true';
+			const noAP = params.get('noAP') === 'true';
+			const noAS = params.get('noAS') === 'true'; // no attack speed
+			const noRes = params.get('noRes') === 'true'; // no armor/magic resistance
+			const noCrit = params.get('noCrit') === 'true';
+			const items = await buildRandom({ noAD, noAP, noAS, noRes, noCrit });
+			const response = new Response(JSON.stringify(items));
 			if (req.headers.get('Origin') === 'http://localhost:3000')
 				response.headers.set('Access-Control-Allow-Origin', 'http://localhost:3000');
 			else response.headers.set('Access-Control-Allow-Origin', 'https://lol.tunatuna.dev');
