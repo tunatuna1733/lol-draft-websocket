@@ -50,6 +50,7 @@ await dbClient.init();
 
 export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 	port: 443,
+	idleTimeout: 30,
 	async fetch(req, server) {
 		const url = new URL(req.url);
 		if (req.method === 'POST' && url.pathname === '/createRoom') {
