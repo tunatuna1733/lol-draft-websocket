@@ -44,6 +44,7 @@ import type { ResultDetailRecord, SearchRequestData } from './types/db';
 import type { CreateTeamPayload, TeamCreationData, TeamMessage } from './types/team';
 import { parseCookie } from './util';
 
+console.log('Initializing database client...');
 export const dbClient = new MongoDBClient();
 await dbClient.init();
 
