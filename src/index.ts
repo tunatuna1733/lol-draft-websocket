@@ -186,6 +186,11 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 			const t3BootsIDs = items.t3bootsItems.map((i) => i.id);
 			const itemIDs = [...legendaryItemIDs, ...supportItemIDs, ...t2BootsIDs, ...t3BootsIDs];
 			const response = new Response(JSON.stringify(itemIDs));
+			if (req.headers.get('Origin') === 'http://localhost:3000')
+				response.headers.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+			else response.headers.set('Access-Control-Allow-Origin', 'https://lol.tunatuna.dev');
+			response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+			response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
 			return response;
 		}
 		const cookies = req.headers.get('cookies');
