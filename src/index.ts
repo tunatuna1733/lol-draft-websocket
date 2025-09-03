@@ -168,8 +168,24 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 			const noAS = params.get('noAS') === 'true'; // no attack speed
 			const noRes = params.get('noRes') === 'true'; // no armor/magic resistance
 			const noCrit = params.get('noCrit') === 'true';
-			const items = await buildRandom({ noAD, noAP, noAS, noRes, noCrit });
+			const isSupport = params.get('isSupport') === 'true';
+			const items = await buildRandom({ noAD, noAP, noAS, noRes, noCrit, isSupport });
 			const response = new Response(JSON.stringify(items));
+			if (req.headers.get('Origin') === 'http://localhost:3000')
+				response.headers.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+			else response.headers.set('Access-Control-Allow-Origin', 'https://lol.tunatuna.dev');
+			response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+			response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+			return response;
+		}
+		if (req.method === 'GET' && url.pathname === '/itemIDs') {
+			const items = await getItemList();
+			const legendaryItemIDs = items.legendaryItems.map((i) => i.id);
+			const supportItemIDs = items.supportItems.map((i) => i.id);
+			const t2BootsIDs = items.t2bootsItems.map((i) => i.id);
+			const t3BootsIDs = items.t3bootsItems.map((i) => i.id);
+			const itemIDs = [...legendaryItemIDs, ...supportItemIDs, ...t2BootsIDs, ...t3BootsIDs];
+			const response = new Response(JSON.stringify(itemIDs));
 			if (req.headers.get('Origin') === 'http://localhost:3000')
 				response.headers.set('Access-Control-Allow-Origin', 'http://localhost:3000');
 			else response.headers.set('Access-Control-Allow-Origin', 'https://lol.tunatuna.dev');
