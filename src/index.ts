@@ -181,7 +181,11 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 			return response;
 		}
 		if (req.method === 'GET' && url.pathname === '/itemIDs') {
+			console.log('Fetching item IDs...');
 			const items = await getItemList();
+			console.log(
+				`Item IDs fetched. ${items.legendaryItems.length} legendary items, ${items.supportItems.length} support items, ${items.t2bootsItems.length} t2 boots, ${items.t3bootsItems.length} t3 boots.`,
+			);
 			const legendaryItemIDs = items.legendaryItems.map((i) => i.id);
 			const supportItemIDs = items.supportItems.map((i) => i.id);
 			const t2BootsIDs = items.t2bootsItems.map((i) => i.id);
