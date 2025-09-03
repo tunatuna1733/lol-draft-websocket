@@ -19,10 +19,14 @@ const getLatestDDragonVersion = async () => {
 
 export const getItemList = async () => {
 	const version = await getLatestDDragonVersion();
+	console.log(`Using DDragon version: ${version}`);
 	const URL = `https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/item.json`;
 
 	const res = await fetch(URL);
 	const data = (await res.json()) as ItemResponse;
+
+	console.log('Fetched item data from DDragon');
+	console.log(`Total items fetched: ${Object.keys(data.data).length}`);
 
 	const itemEntries = Object.entries(data.data);
 
