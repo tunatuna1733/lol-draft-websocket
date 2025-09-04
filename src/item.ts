@@ -13,7 +13,6 @@ const convertStats = (stats: { [key: string]: number }) => {
 
 const getLatestDDragonVersion = async () => {
 	const response = await fetch('https://ddragon.leagueoflegends.com/api/versions.json');
-	console.log(response);
 	const versions = (await response.json()) as string[];
 	return versions[0];
 };
