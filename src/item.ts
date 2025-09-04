@@ -13,21 +13,17 @@ const convertStats = (stats: { [key: string]: number }) => {
 
 const getLatestDDragonVersion = async () => {
 	const response = await fetch('https://ddragon.leagueoflegends.com/api/versions.json');
+	console.log(response);
 	const versions = (await response.json()) as string[];
-	console.log('Available DDragon versions:', versions);
 	return versions[0];
 };
 
 export const getItemList = async () => {
-	// const version = await getLatestDDragonVersion();
-	// console.log(`Using DDragon version: ${version}`);
-	const URL = `https://ddragon.leagueoflegends.com/cdn/15.17.1/data/en_US/item.json`;
+	const version = await getLatestDDragonVersion();
+	const URL = `https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/item.json`;
 
 	const res = await fetch(URL);
 	const data = (await res.json()) as ItemResponse;
-
-	console.log('Fetched item data from DDragon');
-	console.log(`Total items fetched: ${Object.keys(data.data).length}`);
 
 	const itemEntries = Object.entries(data.data);
 
