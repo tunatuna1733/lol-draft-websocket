@@ -27,15 +27,20 @@ export const sendDraftImage = (data: DraftImageMessage) => {
 			channelId: data.channelId,
 			fearlessId: data.fearlessId,
 		};
-		fetch(url, { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } }).then(
-			async (res) => {
-				console.log(res);
-				const resJson: ImageResponse = await res.json();
-				console.log(resJson);
-				if (!resJson.success) {
-					timer.roomData.imageSent = false;
-				}
-			},
-		);
+		try {
+			fetch(url, { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } }).then(
+				async (res) => {
+					console.log(res);
+					const resJson: ImageResponse = await res.json();
+					console.log(resJson);
+					if (!resJson.success) {
+						timer.roomData.imageSent = false;
+					}
+				},
+			);
+		} catch (error) {
+			console.error('[SendDraftImage]Failed to send draft image:', error);
+			timer.roomData.imageSent = false;
+		}
 	}
 };
