@@ -29,7 +29,9 @@ export const sendDraftImage = (data: DraftImageMessage) => {
 		};
 		fetch(url, { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } }).then(
 			async (res) => {
+				console.log(res);
 				const resJson: ImageResponse = await res.json();
+				console.log(resJson);
 				if (!resJson.success) {
 					timer.roomData.imageSent = false;
 				}
