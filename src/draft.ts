@@ -3,6 +3,8 @@ import { dbClient } from '.';
 import type { PhaseData, RoomData } from './types/room';
 import type { CurrentPhase, StartPhase } from './types/server';
 
+const phaseTime = 33 * 1000;
+
 export class DraftTimer {
 	steps = [
 		{ kind: 'Ban', team: 'Blue', order: 1 },
@@ -67,7 +69,7 @@ export class DraftTimer {
 		}
 		const step = this.steps[this.currentStep];
 		this.stepStartTime = Date.now();
-		this.remainingTime = 30 * 1000;
+		this.remainingTime = phaseTime;
 		const eta = this.stepStartTime + this.remainingTime;
 		this.currentStep++;
 		const data: PhaseData = {
@@ -89,7 +91,7 @@ export class DraftTimer {
 		this.timerId = setTimeout(() => {
 			this.pickSelectedChamp();
 			this.startPhase();
-		}, 30 * 1000);
+		}, phaseTime);
 	};
 
 	pause = () => {
