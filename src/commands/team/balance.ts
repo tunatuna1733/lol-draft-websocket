@@ -18,6 +18,8 @@ export const teamBalance = (server: Server, data: TeamBalanceMessage) => {
 		return;
 	}
 	const candidates: { blue: PlayerData[]; red: PlayerData[]; diff: number }[] = [];
+	const seen = new Set<string>();
+	const idOf = (p: PlayerData) => (p.id && p.id !== '' ? p.id : p.name);
 	if (!data.excludeJungle) {
 		const players = [...team.Blue, ...team.Red];
 		// normal balancing
@@ -28,11 +30,17 @@ export const teamBalance = (server: Server, data: TeamBalanceMessage) => {
 						for (let m = l + 1; m <= 9; m++) {
 							const blue = [players[i], players[j], players[k], players[l], players[m]];
 							const red = players.filter((p) => !blue.includes(p));
-							candidates.push({
-								blue,
-								red,
-								diff: 0,
-							});
+							const blueKey = blue.map(idOf).sort().join('|');
+							const redKey = red.map(idOf).sort().join('|');
+							const key = blueKey < redKey ? `${blueKey}::${redKey}` : `${redKey}::${blueKey}`;
+							if (!seen.has(key)) {
+								seen.add(key);
+								candidates.push({
+									blue,
+									red,
+									diff: 0,
+								});
+							}
 						}
 					}
 				}
@@ -53,21 +61,36 @@ export const teamBalance = (server: Server, data: TeamBalanceMessage) => {
 					for (let l = k + 1; l <= 7; l++) {
 						const blue = [players[i], players[j], players[k], players[l]];
 						const red = players.filter((p) => !blue.includes(p));
-						candidates.push({
-							blue: [...blue, blueJug],
-							red: [...red, redJug],
-							diff: 0,
-						});
-						candidates.push({
-							blue: [...blue, redJug],
-							red: [...red, blueJug],
-							diff: 0,
-						});
+						// candidate: blue + own jungler, red + own jungler
+						{
+							const b = [...blue, blueJug];
+							const r = [...red, redJug];
+							const blueKey = b.map(idOf).sort().join('|');
+							const redKey = r.map(idOf).sort().join('|');
+							const key = blueKey < redKey ? `${blueKey}::${redKey}` : `${redKey}::${blueKey}`;
+							if (!seen.has(key)) {
+								seen.add(key);
+								candidates.push({ blue: b, red: r, diff: 0 });
+							}
+						}
+						// candidate: blue + opponent jungler, red + opponent jungler (swap junglers)
+						{
+							const b = [...blue, redJug];
+							const r = [...red, blueJug];
+							const blueKey = b.map(idOf).sort().join('|');
+							const redKey = r.map(idOf).sort().join('|');
+							const key = blueKey < redKey ? `${blueKey}::${redKey}` : `${redKey}::${blueKey}`;
+							if (!seen.has(key)) {
+								seen.add(key);
+								candidates.push({ blue: b, red: r, diff: 0 });
+							}
+						}
 					}
 				}
 			}
 		}
 	}
+
 	for (const candidate of candidates) {
 		candidate.diff = Math.abs(
 			candidate.blue.reduce((acc, p) => acc + p.elo, 0) - candidate.red.reduce((acc, p) => acc + p.elo, 0),
@@ -75,8 +98,8 @@ export const teamBalance = (server: Server, data: TeamBalanceMessage) => {
 	}
 	candidates.sort((a, b) => b.diff - a.diff).reverse();
 
-	team.Blue = candidates[0].blue;
-	team.Red = candidates[0].red;
+	team.Blue = candidates[data.balancingRank].blue;
+	team.Red = candidates[data.balancingRank].red;
 
 	publishTeamInfo(server, team);
 };

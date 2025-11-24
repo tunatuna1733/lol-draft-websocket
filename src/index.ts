@@ -20,9 +20,9 @@ import { createDraft } from './commands/team/createDraft';
 import { createTeam } from './commands/team/createTeam';
 import { teamPickLane } from './commands/team/pickLane';
 import { teamTransferPlayer } from './commands/team/transferPlayer';
-import { teams } from './data';
+import { rooms, teams } from './data';
 import { MongoDBClient } from './db';
-import { buildRandom, getItemList } from './item';
+import { buildRandom, getItemList } from './riot';
 import type {
 	AddNPCMessage,
 	BaseMessage,
@@ -90,6 +90,41 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 			response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
 			response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
 			return response;
+		}
+		if (
+			req.method === 'GET' &&
+			(url.pathname === '/dashboard' || url.pathname === '/api/rooms' || url.pathname === '/api/teams')
+		) {
+			const username = Bun.env.DASHBOARD_USERNAME;
+			const password = Bun.env.DASHBOARD_PASSWORD;
+			if (username && password) {
+				const authHeader = req.headers.get('Authorization');
+				if (!authHeader) {
+					return new Response('Unauthorized', {
+						status: 401,
+						headers: { 'WWW-Authenticate': 'Basic realm="Dashboard"' },
+					});
+				}
+				const b64auth = authHeader.split(' ')[1];
+				const [user, pass] = Buffer.from(b64auth, 'base64').toString().split(':');
+				if (user !== username || pass !== password) {
+					return new Response('Forbidden', { status: 403 });
+				}
+			}
+
+			if (url.pathname === '/dashboard') {
+				return new Response(Bun.file('public/dashboard.html'));
+			}
+			if (url.pathname === '/api/rooms') {
+				return new Response(JSON.stringify(rooms), {
+					headers: { 'Content-Type': 'application/json' },
+				});
+			}
+			if (url.pathname === '/api/teams') {
+				return new Response(JSON.stringify(teams), {
+					headers: { 'Content-Type': 'application/json' },
+				});
+			}
 		}
 		if (req.method === 'GET' && url.pathname === '/fearless') {
 			const params = url.searchParams;
@@ -208,14 +243,14 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 				if (team) ws.send(JSON.stringify(team));
 			}
 		},
-		message(ws, message) {
+		async message(ws, message) {
 			if (typeof message !== 'string') return;
 			if (ws.data.teamID) {
 				// team creation messages
 				const parsedMessage: TeamMessage = JSON.parse(message);
 				switch (parsedMessage.command) {
 					case 'AddPlayer':
-						teamAddPlayer(server, parsedMessage);
+						await teamAddPlayer(server, parsedMessage);
 						break;
 					case 'PickLane':
 						teamPickLane(server, parsedMessage);

@@ -50,9 +50,11 @@ export interface TeamPickLaneMessage extends BaseMessage {
 export interface TeamAddPlayerMessage extends BaseMessage {
 	command: 'AddPlayer';
 	name: string;
-	icon: string;
+	icon?: string;
 	lane: Blankable<Lane>;
 	beginner: boolean;
+	gameName?: string;
+	tagLine?: string;
 }
 
 export interface TeamTransferPlayerMessage extends BaseMessage {
@@ -73,6 +75,7 @@ export interface TeamCreateDraftMessage extends BaseMessage {
 export interface TeamBalanceMessage extends BaseMessage {
 	command: 'Balance';
 	excludeJungle: boolean;
+	balancingRank: number;
 }
 
 export type PlayerData = CreateTeamPlayer;

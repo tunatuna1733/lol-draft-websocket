@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoL Draft Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            width: 300px;
+        }
+        .card h2 {
+            margin-top: 0;
+            font-size: 1.2em;
+            color: #555;
+        }
+        .status {
+            font-weight: bold;
+            color: #007bff;
+        }
+        .card {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; 
+            max-width: 800px;
+            border-radius: 8px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        pre {
+            background: #f4f4f9;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .detail-section {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .detail-section:last-child {
+            border-bottom: none;
+        }
+        .team-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .team-table th, .team-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .team-table th {
+            background-color: #f2f2f2;
+        }
+        .blue-team { color: #0056b3; }
+        .red-team { color: #c82333; }
+    </style>
+</head>
+<body>
+    <h1>LoL Draft Dashboard</h1>
+    <div id="rooms-container" class="container">
+        <p>Loading room data...</p>
+    </div>
+
+    <h1>Team Creation Rooms</h1>
+    <div id="teams-container" class="container">
+        <p>Loading team data...</p>
+    </div>
+
+    <!-- Modal -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">Room Details</h2>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentRooms = [];
+        let currentTeams = [];
+        let currentModalType = null;
+        let currentModalId = null;
+
+        async function fetchDashboardData() {
+            try {
+                const [roomsRes, teamsRes] = await Promise.all([
+                    fetch('/api/rooms'),
+                    fetch('/api/teams')
+                ]);
+                currentRooms = await roomsRes.json();
+                currentTeams = await teamsRes.json();
+                renderRooms(currentRooms);
+                renderTeams(currentTeams);
+
+                if (currentModalType && currentModalId) {
+                    updateModalContent();
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                document.getElementById('rooms-container').innerHTML = '<p>Error loading data.</p>';
+                document.getElementById('teams-container').innerHTML = '<p>Error loading data.</p>';
+            }
+        }
+
+        function renderRooms(rooms) {
+            const container = document.getElementById('rooms-container');
+            if (rooms.length === 0) {
+                container.innerHTML = '<p>No active draft rooms.</p>';
+                return;
+            }
+
+            container.innerHTML = rooms.map(room => `
+                <div class="card" onclick="openModal('draft', '${room.id}')">
+                    <h2>${room.name || 'Untitled Room'} <small>(${room.id})</small></h2>
+                    <p>Status: <span class="status">${room.ended ? 'Ended' : (room.started ? 'In Progress' : 'Starting')}</span></p>
+                    <p>Phase: ${room.currentPhase ? `${room.currentPhase.kind} - ${room.currentPhase.team}` : 'N/A'}</p>
+                    
+                    <div style="margin-top: 10px;">
+                        <strong>Blue Team (${room.teams.Blue.name})</strong>
+                        <ul>
+                            ${room.teams.Blue.players.map(p => `<li>${p.name} (${p.champ || '...'})</li>`).join('')}
+                        </ul>
+                        <div>Bans: ${room.teams.Blue.bans.join(', ') || 'None'}</div>
+                    </div>
+
+                    <div style="margin-top: 10px;">
+                        <strong>Red Team (${room.teams.Red.name})</strong>
+                        <ul>
+                            ${room.teams.Red.players.map(p => `<li>${p.name} (${p.champ || '...'})</li>`).join('')}
+                        </ul>
+                        <div>Bans: ${room.teams.Red.bans.join(', ') || 'None'}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderTeams(teams) {
+            const container = document.getElementById('teams-container');
+            if (teams.length === 0) {
+                container.innerHTML = '<p>No active team creation rooms.</p>';
+                return;
+            }
+
+            container.innerHTML = teams.map(team => `
+                <div class="card" onclick="openModal('team', '${team.id}')">
+                    <h2>Team Room <small>(${team.id})</small></h2>
+                    <p>Created: ${new Date(team.createdTime).toLocaleTimeString()}</p>
+                    
+                    <div style="margin-top: 10px;">
+                        <strong>Blue Team</strong>
+                        <ul>
+                            ${team.Blue.map(p => `<li>${p.name} (${p.lane || 'Fill'})</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <div style="margin-top: 10px;">
+                        <strong>Red Team</strong>
+                        <ul>
+                            ${team.Red.map(p => `<li>${p.name} (${p.lane || 'Fill'})</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <div style="margin-top: 10px;">
+                        <strong>Unassigned</strong>
+                        <ul>
+                            ${team.Unassigned.map(p => `<li>${p.name} (${p.lane || 'Fill'})</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openModal(type, id) {
+            currentModalType = type;
+            currentModalId = id;
+            updateModalContent();
+            document.getElementById('detailModal').style.display = "block";
+        }
+
+        function updateModalContent() {
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            let data;
+            if (currentModalType === 'draft') {
+                data = currentRooms.find(r => r.id === currentModalId);
+                if (data) {
+                    modalTitle.innerText = `Draft Room: ${data.name || currentModalId}`;
+                    modalBody.innerHTML = renderDraftDetails(data);
+                }
+            } else {
+                data = currentTeams.find(t => t.id === currentModalId);
+                if (data) {
+                    modalTitle.innerText = `Team Room: ${currentModalId}`;
+                    modalBody.innerHTML = renderTeamCreationDetails(data);
+                }
+            }
+
+            if (!data) {
+                modalBody.innerHTML = '<p>Room data not found or room has ended.</p>';
+            }
+        }
+
+        function renderDraftDetails(room) {
+            const renderPlayerRow = (p) => `
+                <tr>
+                    <td>${p.name} ${p.isNPC ? '(NPC)' : ''}</td>
+                    <td>${p.lane || '-'}</td>
+                    <td>${p.champ || '-'}</td>
+                </tr>
+            `;
+
+            return `
+                <div class="detail-section">
+                    <h3>General Info</h3>
+                    <p><strong>ID:</strong> ${room.id}</p>
+                    <p><strong>Status:</strong> ${room.ended ? 'Ended' : (room.started ? 'In Progress' : 'Starting')}</p>
+                    <p><strong>Phase:</strong> ${room.currentPhase ? `${room.currentPhase.kind} - ${room.currentPhase.team} (Order: ${room.currentPhase.order})` : 'N/A'}</p>
+                    <p><strong>Global Bans:</strong> ${room.globalBans.join(', ') || 'None'}</p>
+                </div>
+
+                <div class="detail-section">
+                    <h3 class="blue-team">Blue Team (${room.teams.Blue.name})</h3>
+                    <p><strong>Bans:</strong> ${room.teams.Blue.bans.join(', ') || 'None'}</p>
+                    <table class="team-table">
+                        <thead><tr><th>Player</th><th>Lane</th><th>Champion</th></tr></thead>
+                        <tbody>${room.teams.Blue.players.map(renderPlayerRow).join('')}</tbody>
+                    </table>
+                </div>
+
+                <div class="detail-section">
+                    <h3 class="red-team">Red Team (${room.teams.Red.name})</h3>
+                    <p><strong>Bans:</strong> ${room.teams.Red.bans.join(', ') || 'None'}</p>
+                    <table class="team-table">
+                        <thead><tr><th>Player</th><th>Lane</th><th>Champion</th></tr></thead>
+                        <tbody>${room.teams.Red.players.map(renderPlayerRow).join('')}</tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderTeamCreationDetails(team) {
+            const renderPlayerRow = (p) => `
+                <tr>
+                    <td>${p.name}</td>
+                    <td>${p.lane || 'Fill'}</td>
+                    <td>${p.elo}</td>
+                    <td>${p.SOLO ? `${p.SOLO.tier} ${p.SOLO.rank} (${p.SOLO.leaguePoints} LP)` : 'Unranked'}</td>
+                </tr>
+            `;
+
+            const renderTeamTable = (title, players, colorClass) => `
+                <div class="detail-section">
+                    <h3 class="${colorClass}">${title}</h3>
+                    ${players.length > 0 ? `
+                    <table class="team-table">
+                        <thead><tr><th>Player</th><th>Lane</th><th>Elo</th><th>Rank (Solo)</th></tr></thead>
+                        <tbody>${players.map(renderPlayerRow).join('')}</tbody>
+                    </table>
+                    ` : '<p>No players</p>'}
+                </div>
+            `;
+
+            return `
+                <div class="detail-section">
+                    <h3>General Info</h3>
+                    <p><strong>ID:</strong> ${team.id}</p>
+                    <p><strong>Created:</strong> ${new Date(team.createdTime).toLocaleString()}</p>
+                    <p><strong>Draft ID:</strong> ${team.draftId || 'Not started'}</p>
+                </div>
+                ${renderTeamTable('Blue Team', team.Blue, 'blue-team')}
+                ${renderTeamTable('Red Team', team.Red, 'red-team')}
+                ${renderTeamTable('Unassigned', team.Unassigned, '')}
+            `;
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').style.display = "none";
+            currentModalType = null;
+            currentModalId = null;
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('detailModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        fetchDashboardData();
+        // Refresh every 5 seconds
+        setInterval(fetchDashboardData, 5000);
+    </script>
+</body>
+</html>
