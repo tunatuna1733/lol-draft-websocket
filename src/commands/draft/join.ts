@@ -4,7 +4,7 @@ import type { JoinMessage } from '../../types/client';
 import type { DraftPlayerData } from '../../types/room';
 import type { MakeSpec, ResultMessage } from '../../types/server';
 
-export const join = (ws: ServerWebSocket<unknown>, data: JoinMessage, server: Server) => {
+export const join = (ws: ServerWebSocket<unknown>, data: JoinMessage, server: Server, clientUuid: string) => {
 	const roomData = rooms.find((r) => r.id === data.roomID);
 	if (!roomData) {
 		const error: ResultMessage = {
@@ -35,7 +35,7 @@ export const join = (ws: ServerWebSocket<unknown>, data: JoinMessage, server: Se
 		lane: '',
 		champ: '',
 		isNPC: false,
-		isBeginner: data.beginner || false,
+		uuid: clientUuid,
 	};
 	if (!roomData.teams[data.team].players.find((p) => p.name === data.name)) {
 		if (roomData.teams[data.team].players.length >= 5) {

@@ -8,6 +8,32 @@ export let teams: TeamCreationData[] = [];
 
 export const timers: { [index in string]: DraftTimer } = {};
 
+export const getRoomIdByClientUuid = (clientUuid: string) => {
+	for (const room of rooms) {
+		for (const teamKey of ['Blue', 'Red'] as const) {
+			const team = room.teams[teamKey];
+			if (team.players.find((p) => p.uuid === clientUuid)) {
+				return room.id;
+			}
+		}
+	}
+	return null;
+};
+
+export const removePlayerByClientUuid = (clientUuid: string) => {
+	for (const room of rooms) {
+		for (const teamKey of ['Blue', 'Red'] as const) {
+			const team = room.teams[teamKey];
+			const playerIndex = team.players.findIndex((p) => p.uuid === clientUuid);
+			if (playerIndex !== -1) {
+				team.players.splice(playerIndex, 1);
+				return true;
+			}
+		}
+	}
+	return false;
+};
+
 setInterval(() => {
 	// check for ended and expired rooms
 	const endedIDs = Object.values(timers)

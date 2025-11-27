@@ -7,6 +7,7 @@ export interface DraftPlayerData {
 	lane: Blankable<Lane>;
 	champ: string;
 	isNPC: boolean;
+	uuid: string;
 }
 
 export interface PhaseData {

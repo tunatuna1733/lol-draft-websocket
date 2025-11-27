@@ -32,7 +32,6 @@ export interface JoinMessage extends BaseMessage {
 	name: string;
 	team: Team;
 	isSpec?: boolean;
-	beginner?: boolean;
 	bypass?: boolean;
 }
 

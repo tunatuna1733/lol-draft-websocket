@@ -1,3 +1,4 @@
+import type { ServerWebSocket } from 'bun';
 import { addNPC } from './commands/draft/addNPC';
 import { createRoom } from './commands/draft/createRoom';
 import { join } from './commands/draft/join';
@@ -20,7 +21,7 @@ import { createDraft } from './commands/team/createDraft';
 import { createTeam } from './commands/team/createTeam';
 import { teamPickLane } from './commands/team/pickLane';
 import { teamTransferPlayer } from './commands/team/transferPlayer';
-import { rooms, teams } from './data';
+import { getRoomIdByClientUuid, removePlayerByClientUuid, rooms, teams } from './data';
 import { MongoDBClient } from './db';
 import { buildRandom, getItemList } from './riot';
 import type {
@@ -47,6 +48,8 @@ import { parseCookie } from './util';
 console.log('Initializing database client...');
 export const dbClient = new MongoDBClient();
 await dbClient.init();
+
+const draftClients = new Map<ServerWebSocket<unknown>, string>();
 
 export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 	port: 443,
@@ -273,9 +276,12 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 			} else {
 				const parsedMessage: BaseMessage = JSON.parse(message);
 				switch (parsedMessage.command) {
-					case 'Join':
-						join(ws, parsedMessage as JoinMessage, server);
+					case 'Join': {
+						const uuid = crypto.randomUUID();
+						join(ws, parsedMessage as JoinMessage, server, uuid);
+						draftClients.set(ws, uuid);
 						break;
+					}
 					case 'Ready':
 						ready(ws, parsedMessage as ReadyMessage);
 						break;
@@ -321,11 +327,17 @@ export const server = Bun.serve<{ roomID?: string; teamID?: string }>({
 			}
 		},
 		close(ws) {
-			if (ws.data.roomID) {
-				ws.unsubscribe(ws.data.roomID);
-			}
 			if (ws.data.teamID) {
 				ws.unsubscribe(`team-${ws.data.teamID}`);
+			} else {
+				const uuid = draftClients.get(ws);
+				if (!uuid) return;
+				const roomId = getRoomIdByClientUuid(uuid);
+				if (roomId) {
+					ws.unsubscribe(roomId);
+				}
+				removePlayerByClientUuid(uuid);
+				draftClients.delete(ws);
 			}
 		},
 	},
